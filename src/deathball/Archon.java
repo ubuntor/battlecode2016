@@ -9,6 +9,10 @@ import java.util.Random;
  */
 public class Archon {
     public static void run(RobotController rc) {
+        Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST,
+                Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
+        Random rand = new Random(rc.getID());
+        int fate = rand.nextInt(1000);
         int mode = 0;
         int destx = 0;
         int desty = 0;
@@ -45,7 +49,7 @@ public class Archon {
                     if (Math.random() * rc.getRoundNum() / 3000 >= 0.95 && rc.getTeamParts() >= 40) {
                         typeToBuild = RobotType.SCOUT;
                     }
-                    if (Math.random() > 0.75) {
+                    else if (Math.random() > 0.75) {
                         typeToBuild = RobotType.SOLDIER;
                     }
                     for (int i = 0; i < 8; i++) {
@@ -67,17 +71,20 @@ public class Archon {
                 RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), 53);
                 for (int i = 0; i < enemies.length; i++) {
                     if (rc.getLocation().distanceSquaredTo(enemies[i].location) <= 26) {
-                        if (rc.isCoreReady()) {
-                            // Check the rubble in that direction
-                            if (rc.canMove(enemies[i].location.directionTo(rc.getLocation()))) {
+                        Direction dir = enemies[i].location.directionTo(rc.getLocation());
+                        for(int j = 0; j < 8; j++) {
+                            if (rc.canMove(dir)) {
                                 // Move
-                                rc.move(enemies[i].location.directionTo(rc.getLocation()));
+                                rc.move(dir);
+                                break;
+                            } else {
+                                dir = dir.rotateRight();
                             }
                         }
                     } else {
                         int x = enemies[i].location.x;
                         int y = enemies[i].location.y;
-                        rc.broadcastMessageSignal(9, 9, 70);
+                        rc.broadcastMessageSignal(9, 9, 70); //attaaack
                         rc.broadcastMessageSignal(x, y, 70);
                         if (rc.getTeamParts() <= 30) {
                             destx = x;
@@ -86,7 +93,7 @@ public class Archon {
                         }
                     }
                 }
-
+                //read
                 Signal msg = null;
                 int priority = -1;
                 int lvl = 0;
@@ -133,6 +140,34 @@ public class Archon {
                             rc.move(rc.getLocation().directionTo(loc));
                         }
                     }
+                }
+                //scrap
+                MapLocation[] scrap = rc.sensePartLocations(35);
+                MapLocation closest = rc.getLocation();
+                double distance = 999.000;
+                for(int i = 0; i < scrap.length; i++){
+                    if(scrap[i].distanceSquaredTo(rc.getLocation()) <= distance){
+                        closest = scrap[i];
+                        distance = scrap[i].distanceSquaredTo(rc.getLocation());
+                    }
+                }
+                Direction dirToMove;
+                if(!closest.equals(rc.getLocation())){
+                    dirToMove = rc.getLocation().directionTo(closest);
+                    rc.broadcastMessageSignal(9, 9, 70);
+                    rc.broadcastMessageSignal(closest.x, closest.y, 70);
+                }
+                else {
+                    dirToMove = directions[fate % 8];
+                }
+                // Check the rubble in that direction
+                if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                    // Too much rubble, so I should clear it
+                    rc.clearRubble(dirToMove);
+                    // Check if I can move in this direction
+                } else if (rc.canMove(dirToMove)) {
+                    // Move
+                    rc.move(dirToMove);
                 }
                 Clock.yield();
             } catch (Exception e) {
