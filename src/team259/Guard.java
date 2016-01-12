@@ -131,7 +131,6 @@ public class Guard {
                     }
                 }
                 //patrol
-
                 int rand = (int)(Math.random()*8);
                 Direction dir = directions[rand];
 

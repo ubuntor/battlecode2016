@@ -32,7 +32,7 @@ public class Scout {
                                     rc.move(dir);
                                     break;
                                 } else {
-                                    dir = dir.rotateRight();
+                                    dir = dir.rotateLeft();
                                 }
                             }
                         }

@@ -8,6 +8,10 @@ import java.util.Random;
  */
 public class Archon {
     public static void run(RobotController rc) {
+        Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST,
+                Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
+        Random rand = new Random(rc.getID());
+        int fate = rand.nextInt(1000);
         int mode = 0;
         int destx = 0;
         int desty = 0;
@@ -138,6 +142,16 @@ public class Archon {
                             rc.move(rc.getLocation().directionTo(loc));
                         }
                     }
+                }
+                Direction dirToMove = directions[fate % 8];
+                // Check the rubble in that direction
+                if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                    // Too much rubble, so I should clear it
+                    rc.clearRubble(dirToMove);
+                    // Check if I can move in this direction
+                } else if (rc.canMove(dirToMove)) {
+                    // Move
+                    rc.move(dirToMove);
                 }
                     Clock.yield();
             } catch (Exception e) {
