@@ -25,9 +25,20 @@ public class Scout {
                     if (rc.getLocation().distanceSquaredTo(enemies[i].location) <= 26) {
                         if (rc.isCoreReady()) {
                             // Check the rubble in that direction
-                            if (rc.canMove(enemies[i].location.directionTo(rc.getLocation()))) {
-                                // Move
-                                rc.move(enemies[i].location.directionTo(rc.getLocation()));
+                        	Direction optimalAwayDir = enemies[i].location.directionTo(rc.getLocation());
+                            if (rc.canMove(optimalAwayDir)) {
+                                // Move away
+                            	rc.move(optimalAwayDir);
+                            } else {
+                            	if (rc.canMove(optimalAwayDir.rotateLeft()))
+                            		rc.move(optimalAwayDir.rotateLeft());
+                            	else if (rc.canMove(optimalAwayDir.rotateRight()))
+                            		rc.move(optimalAwayDir.rotateRight());
+                        		else if (rc.canMove(optimalAwayDir.rotateLeft().rotateLeft()))
+                        			rc.move(optimalAwayDir.rotateLeft().rotateLeft());
+                        		else if (rc.canMove(optimalAwayDir.rotateRight().rotateRight()))
+                        			rc.move(optimalAwayDir.rotateRight().rotateRight());
+                            	// if we still can't move then we're fucked lol
                             }
                         }
                     }
@@ -45,7 +56,8 @@ public class Scout {
                     }
                 }
 
-                if (rc.isCoreReady()) {
+                if (rc.isCoreReady() && rc.getHealth() > 50) { 
+                	// we have to be healthy before doing this spiral shit
                     // Check the rubble in that direction
                     if (rc.canMove(dirToMove)) {
                         // Move
