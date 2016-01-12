@@ -1,6 +1,7 @@
 package deathball;
 
 import battlecode.common.*;
+import java.util.Random;
 
 /**
  * Created by samuel on 1/11/16.
@@ -32,21 +33,41 @@ public class Archon {
         }
         while (true) {
             try {
-                Direction dirToBuild = Direction.NORTH_WEST;
-                RobotType typeToBuild = RobotType.GUARD;
-                if (rc.getTeamParts() >= 30) {
-                    for (int i = 0; i < 8; i++) {
+                int priority = -1;
+                int lvl = 0;
+                Signal msg;
+                Signal[] inbox = rc.emptySignalQueue();
+                for(int i = 0; i <inbox.length; i++){
+                    if(inbox[i].getTeam() == rc.getTeam()){
+                        if(inbox[i].getMessage()[0] == 0 && inbox[i].getMessage()[1] == 0){
+                            lvl = 4;
+                        }
+                        else if(inbox[i].getMessage()[0] == 0 && inbox[i].getMessage()[1] == 1){
+                            lvl = 3;
+                        }
+                        else if(inbox[i].getMessage()[0] == 1 && inbox[i].getMessage()[1] == 0){
+                            lvl = 2;
+                        }
+                        else if(lvl > priority){
+                            msg = inbox[i]
+                        }
+                    }
+                }
+
+                if(mode == 0) {
+                    Direction dirToBuild = Direction.NORTH_WEST;
+                    RobotType typeToBuild = RobotType.GUARD;
+                    if (Math.random() > 0.6) {
+                        typeToBuild = RobotType.SOLDIER;
+                    }
+                    if (rc.getTeamParts() >= 30) {
+                        for (int i = 0; i < 8; i++) {
                             // If possible, build in this direction
-                            if (rc.canBuild(dirToBuild, typeToBuild) ) {
+                            if (rc.canBuild(dirToBuild, typeToBuild)) {
                                 rc.build(dirToBuild, typeToBuild);
                                 break;
-                            }
-                            else {
+                            } else {
                                 dirToBuild = dirToBuild.rotateRight();
-                                if (typeToBuild == RobotType.GUARD) {
-                                    typeToBuild = RobotType.SOLDIER;
-                                } else {
-                                    typeToBuild = RobotType.GUARD;
                             }
                         }
                     }

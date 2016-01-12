@@ -15,7 +15,7 @@ public class Guard {
         }
         while (true) {
             try {
-                int heuristic = 0;
+                int heuristic = -1;
                 int val = 0;
                 MapLocation maxloc = rc.getLocation();
                 RobotInfo[] attackable = rc.senseHostileRobots(rc.getLocation(), 2);
@@ -49,7 +49,7 @@ public class Guard {
                 if(rc.isWeaponReady() && !maxloc.equals(rc.getLocation())){
                     rc.attackLocation(maxloc);
                 }
-                heuristic = 0;
+                heuristic = -1;
                 maxloc = rc.getLocation();
                 RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), 24);
                 for(int i = 0; i < enemies.length; i++){
