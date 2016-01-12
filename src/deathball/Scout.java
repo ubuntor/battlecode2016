@@ -57,13 +57,12 @@ public class Scout {
                         dirToMove = dirToMove.rotateRight();
                         dirToMove = dirToMove.rotateRight();
                     }
-                }
-
-                if (stepCount == 0) {
-                    spiralCount++;
-                    stepCount = spiralCount * 7;
-                    dirToMove = dirToMove.rotateRight();
-                    dirToMove = dirToMove.rotateRight();
+                    if (stepCount == 0) {
+                        spiralCount++;
+                        stepCount = spiralCount * 7;
+                        dirToMove = dirToMove.rotateRight();
+                        dirToMove = dirToMove.rotateRight();
+                    }
                 }
 
                 RobotInfo[] neutrals = rc.senseNearbyRobots(rc.getLocation(), 53, Team.NEUTRAL);
