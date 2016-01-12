@@ -21,7 +21,7 @@ public class Scout {
             try {
                 RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), 53);
                 for (int i = 0; i < enemies.length; i++) {
-                    if(rc.getLocation().distanceSquaredTo(enemies[i].location) <= 15){
+                    if(rc.getLocation().distanceSquaredTo(enemies[i].location) <= 26){
                         if (rc.isCoreReady()) {
                             // Check the rubble in that direction
                             if (rc.canMove(enemies[i].location.directionTo(rc.getLocation()))) {
@@ -30,15 +30,13 @@ public class Scout {
                             }
                         }
                     }
-                    if(enemies[i].team == rc.getTeam().opponent() && enemies[i].type == RobotType.ARCHON){
+                    if(enemies[i].team == rc.getTeam().opponent() && enemies[i].type != RobotType.SCOUT){
                         rc.broadcastMessageSignal(0, 0, 106); //first 0 indicates hostile, second 0 indicates other player
                         rc.broadcastMessageSignal(enemies[i].location.x, enemies[i].location.y, 106);
-                    }
-                    if(enemies[i].team == rc.getTeam().opponent() && enemies[i].type != RobotType.SCOUT){
-                        rc.broadcastMessageSignal(0, 0, 106);
+                        rc.broadcastMessageSignal(9, 9, 106); //DAVAI
                         rc.broadcastMessageSignal(enemies[i].location.x, enemies[i].location.y, 106);
                     }
-                    if(enemies[i].type == RobotType.ZOMBIEDEN){
+                    else if(enemies[i].type == RobotType.ZOMBIEDEN){
                         rc.broadcastMessageSignal(0, 0, 106);
                         rc.broadcastMessageSignal(enemies[i].location.x, enemies[i].location.y, 106);
                     }
@@ -47,20 +45,6 @@ public class Scout {
                         rc.broadcastMessageSignal(enemies[i].location.x, enemies[i].location.y, 106);
                     }
 
-                }
-                MapLocation[] parts = rc.sensePartLocations(106);
-                MapLocation close = home;
-                for (int i = 0; i < parts.length; i++) {
-                    if(i ==0){
-                        close = parts[i];
-                    }
-                    else if(parts[i].distanceSquaredTo(home)<=close.distanceSquaredTo(home)){
-                        close = parts[i];
-                    }
-                }
-                if(!close.equals(home)){
-                    rc.broadcastMessageSignal(1, 0, 106);
-                    rc.broadcastMessageSignal(close.x, close.y, 106);
                 }
                 if (rc.isCoreReady()) {
                     // Check the rubble in that direction
@@ -81,6 +65,38 @@ public class Scout {
                     stepCount = spiralCount * 7;
                     dirToMove = dirToMove.rotateRight();
                     dirToMove = dirToMove.rotateRight();
+                }
+
+                RobotInfo[] neutrals = rc.senseNearbyRobots(rc.getLocation(), 53, Team.NEUTRAL);
+                RobotInfo closen = null;
+
+                for (int i = 0; i < neutrals.length; i++)
+                {
+                    if (i == 0){
+                        closen = neutrals[i];
+                    }
+                    else if(neutrals[i].location.distanceSquaredTo(home)<=closen.location.distanceSquaredTo(home)){
+                        closen = neutrals[i];
+                    }
+                }
+                if(!closen.location.equals(home)){
+                    rc.broadcastMessageSignal(1, 0, 106);
+                    rc.broadcastMessageSignal(closen.location.x, closen.location.y, 106);
+                }
+
+                MapLocation close = home;
+                MapLocation[] parts = rc.sensePartLocations(106);
+                for (int i = 0; i < parts.length; i++) {
+                    if(i ==0){
+                        close = parts[i];
+                    }
+                    else if(parts[i].distanceSquaredTo(home)<=close.distanceSquaredTo(home)){
+                        close = parts[i];
+                    }
+                }
+                if(!close.equals(home)) {
+                    rc.broadcastMessageSignal(1, 0, 106);
+                    rc.broadcastMessageSignal(close.x, close.y, 106);
                 }
                 Clock.yield();
             } catch (Exception e) {
