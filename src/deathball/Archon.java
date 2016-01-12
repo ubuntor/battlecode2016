@@ -10,7 +10,7 @@ public class Archon {
 		int[] status = {0,0,0,0,0,0,0};
         int mode = 0;
         try {
-            Direction dirToBuild = directions[0];
+            Direction dirToBuild = Direction.NORTH;
                 for (int i = 0; i < 8; i++) {
                     // If possible, build in this direction
                     if (rc.canBuild(dirToBuild, RobotType.SCOUT)) {

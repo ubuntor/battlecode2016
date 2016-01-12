@@ -21,11 +21,11 @@ public class Scout {
             try {
                 RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), 53);
                         for (int i = 0; i < enemies.length; i++) {
-                            if(enemies[i].team == enemyTeam && enemies[i].type == RobotType.ARCHON){
+                            if(enemies[i].team == rc.getTeam().opponent() && enemies[i].type == RobotType.ARCHON){
                                 rc.broadcastMessageSignal(0, 0, 10000);
                                 rc.broadcastMessageSignal(enemies[i].location.x, enemies[i].location.y, 10000);
                             }
-                            if(enemies[i].team == enemyTeam && enemies[i].type != RobotType.SCOUT){
+                            if(enemies[i].team == rc.getTeam().opponent() && enemies[i].type != RobotType.SCOUT){
                                 rc.broadcastMessageSignal(0, 0, 900);
                                 rc.broadcastMessageSignal(enemies[i].location.x, enemies[i].location.y, 900);
                             }
