@@ -20,6 +20,7 @@ public class Scout {
         while (true) {
             try {
                 RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), 53);
+
                 for (int i = 0; i < enemies.length; i++) {
                     if (rc.getLocation().distanceSquaredTo(enemies[i].location) <= 26) {
                         if (rc.isCoreReady()) {
@@ -42,8 +43,8 @@ public class Scout {
                         rc.broadcastMessageSignal(0, 1, 106);
                         rc.broadcastMessageSignal(enemies[i].location.x, enemies[i].location.y, 106);
                     }
-
                 }
+
                 if (rc.isCoreReady()) {
                     // Check the rubble in that direction
                     if (rc.canMove(dirToMove)) {
@@ -57,6 +58,7 @@ public class Scout {
                         dirToMove = dirToMove.rotateRight();
                     }
                 }
+
                 if (stepCount == 0) {
                     spiralCount++;
                     stepCount = spiralCount * 7;
@@ -76,10 +78,8 @@ public class Scout {
                             mind = nd;
                         }
                     }
-                    if (!closen.location.equals(home)) {
-                        rc.broadcastMessageSignal(1, 0, 106);
-                        rc.broadcastMessageSignal(closen.location.x, closen.location.y, 106);
-                    }
+                    rc.broadcastMessageSignal(1, 0, 106);
+                    rc.broadcastMessageSignal(closen.location.x, closen.location.y, 106);
                 }
 
                 MapLocation[] parts = rc.sensePartLocations(106);
@@ -99,6 +99,7 @@ public class Scout {
                         rc.broadcastMessageSignal(close.x, close.y, 106);
                     }
                 }
+
                 Clock.yield();
             } catch (Exception e) {
                 System.out.println(e.getMessage());
