@@ -25,11 +25,11 @@ public class Archon {
                         dirToBuild = dirToBuild.rotateRight();
                     }
                 }
-                int ID = rc.getID();
-                MapLocation home = rc.getLocation();
-                MapLocation loc = home.add(Direction.NORTH);
-                RobotInfo scoutInfo = rc.senseRobotAtLocation(loc);
-                int scoutID = scoutInfo.ID;
+                //int ID = rc.getID();
+                //MapLocation home = rc.getLocation();
+                //MapLocation loc = home.add(Direction.NORTH);
+                //RobotInfo scoutInfo = rc.senseRobotAtLocation(loc);
+                //int scoutID = scoutInfo.ID;
                 // Any code here gets executed exactly once at the beginning of the game.
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -37,9 +37,35 @@ public class Archon {
         }
         while (true) {
             try {
+                //build
+                if (rc.getTeamParts() >= 30) {
+                    Direction dirToBuild = Direction.NORTH;
+                    RobotType typeToBuild = RobotType.GUARD;
+                    if (Math.random()*rc.getRoundNum()/3000 >= 0.95 && rc.getTeamParts() >= 40) {
+                        typeToBuild = RobotType.SCOUT;
+                    }
+                    if (Math.random() > 0.75) {
+                        typeToBuild = RobotType.SOLDIER;
+                    }
+                    for (int i = 0; i < 8; i++) {
+                        // If possible, build in this direction
+                        if (rc.canBuild(dirToBuild, typeToBuild)) {
+                            rc.build(dirToBuild, typeToBuild);
+                            break;
+                        } else {
+                            dirToBuild = dirToBuild.rotateRight();
+                        }
+                    }
+                }
+                //neutrals
+                RobotInfo[] bots = rc.senseNearbyRobots(2, Team.NEUTRAL);
+                for(int i = 0; i < bots.length; i++){
+                    rc.activate(bots[i].location);
+                }
+                //enemies
                 RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), 53);
                 for (int i = 0; i < enemies.length; i++) {
-                    if (rc.getLocation().distanceSquaredTo(enemies[i].location) <= 15) {
+                    if (rc.getLocation().distanceSquaredTo(enemies[i].location) <= 26) {
                         if (rc.isCoreReady()) {
                             // Check the rubble in that direction
                             if (rc.canMove(enemies[i].location.directionTo(rc.getLocation()))) {
@@ -47,8 +73,19 @@ public class Archon {
                                 rc.move(enemies[i].location.directionTo(rc.getLocation()));
                             }
                         }
+                    } else {
+                        int x = enemies[i].location.x;
+                        int y = enemies[i].location.y;
+                        rc.broadcastMessageSignal(9, 9, 70);
+                        rc.broadcastMessageSignal(x, y, 70);
+                        if(rc.getTeamParts() <= 30) {
+                            destx = x;
+                            desty = y;
+                            mode = 2; //combat mode
+                        }
                     }
                 }
+
                 Signal msg = null;
                 int priority = -1;
                 int lvl = 0;
@@ -57,32 +94,34 @@ public class Archon {
                     lvl = 0;
                     if(inbox[i].getTeam() == rc.getTeam()){
                         if(inbox[i].getMessage()[0] == 0 && inbox[i].getMessage()[1] == 0){
-                            lvl = 4;
-                        }
-                        else if(inbox[i].getMessage()[0] == 0 && inbox[i].getMessage()[1] == 1){
-                            lvl = 3;
+                            lvl = 4; //enemy
                         }
                         else if(inbox[i].getMessage()[0] == 1 && inbox[i].getMessage()[1] == 0){
-                            lvl = 2;
+                            lvl = 3; //parts
+                        }
+                        else if(inbox[i].getMessage()[0] == 0 && inbox[i].getMessage()[1] == 1){
+                            lvl = 2; //zombie
                         }
                         else if(lvl > priority){
                             msg = inbox[i];
+                            priority = lvl;
                         }
                     }
                 }
                 if(msg != null){
                     int x = msg.getMessage()[0];
                     int y = msg.getMessage()[1];
-                    rc.broadcastMessageSignal(9, 9, 70);
+                    rc.broadcastMessageSignal(9, 9, 70); //attack command
                     rc.broadcastMessageSignal(x, y, 70);
-                    if(lvl == 4 || rc.getTeamParts() <= 30){
+                    if((priority == 4 || priority == 3) && rc.getTeamParts() <= 30){
                         destx = x;
                         desty = y;
                         mode = 2; //combat mode
                     }
+                    
                 }
                 if(mode == 2){
-                    RobotInfo[] bots = rc.senseNearbyRobots(2, rc.getTeam());
+                    bots = rc.senseNearbyRobots(2, rc.getTeam());
                     for(int i = 0; i < bots.length; i++){
                         if(bots[i].health < bots[i].maxHealth){
                             rc.repair(bots[i].location);
@@ -94,28 +133,6 @@ public class Archon {
                         if (rc.canMove(rc.getLocation().directionTo(loc))) {
                             // Move
                             rc.move(rc.getLocation().directionTo(loc));
-
-                        }
-                    }
-                }
-                if (rc.getTeamParts() >= 30) {
-                    Direction dirToBuild = Direction.NORTH_WEST;
-                    RobotType typeToBuild = RobotType.GUARD;
-                    if (Math.random() > 0.95 && rc.getTeamParts() >= 40) {
-                        typeToBuild = RobotType.SCOUT;
-                    }
-                    if (Math.random() > 0.75) {
-                        typeToBuild = RobotType.SOLDIER;
-                    }
-
-
-                    for (int i = 0; i < 8; i++) {
-                        // If possible, build in this direction
-                        if (rc.canBuild(dirToBuild, typeToBuild)) {
-                            rc.build(dirToBuild, typeToBuild);
-                            break;
-                        } else {
-                            dirToBuild = dirToBuild.rotateRight();
                         }
                     }
                 }

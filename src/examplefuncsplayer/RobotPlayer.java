@@ -58,7 +58,6 @@ public class RobotPlayer {
                 try {
                     System.out.println("?");
                     int fate = rand.nextInt(1000);
-                    fate = 0;
                     // Check if this ARCHON's core is ready
                     if (fate % 10 == 2) {
                         // Send a message signal containing the data (6370, 6147)
