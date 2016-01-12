@@ -21,19 +21,7 @@ public class Scout {
             try {
                 RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), 53);
                 for (int i = 0; i < enemies.length; i++) {
-                    if(enemies[i].team == rc.getTeam().opponent() && enemies[i].type == RobotType.ARCHON){
-                        rc.broadcastMessageSignal(0, 0, 10000); //first 0 indicates hostile, second 0 indicates other player
-                        rc.broadcastMessageSignal(enemies[i].location.x, enemies[i].location.y, 10000);
-                    }
-                    if(enemies[i].team == rc.getTeam().opponent() && enemies[i].type != RobotType.SCOUT){
-                        rc.broadcastMessageSignal(0, 0, 900);
-                        rc.broadcastMessageSignal(enemies[i].location.x, enemies[i].location.y, 900);
-                    }
-                    else{
-                        rc.broadcastMessageSignal(0, 1, 106);
-                        rc.broadcastMessageSignal(enemies[i].location.x, enemies[i].location.y, 106);
-                    }
-                    if(rc.getLocation().distanceSquaredTo(enemies[i].location) >= 13){
+                    if(rc.getLocation().distanceSquaredTo(enemies[i].location) <= 15){
                         if (rc.isCoreReady()) {
                             // Check the rubble in that direction
                             if (rc.canMove(enemies[i].location.directionTo(rc.getLocation()))) {
@@ -42,6 +30,23 @@ public class Scout {
                             }
                         }
                     }
+                    if(enemies[i].team == rc.getTeam().opponent() && enemies[i].type == RobotType.ARCHON){
+                        rc.broadcastMessageSignal(0, 0, 106); //first 0 indicates hostile, second 0 indicates other player
+                        rc.broadcastMessageSignal(enemies[i].location.x, enemies[i].location.y, 106);
+                    }
+                    if(enemies[i].team == rc.getTeam().opponent() && enemies[i].type != RobotType.SCOUT){
+                        rc.broadcastMessageSignal(0, 0, 106);
+                        rc.broadcastMessageSignal(enemies[i].location.x, enemies[i].location.y, 106);
+                    }
+                    if(enemies[i].type == RobotType.ZOMBIEDEN){
+                        rc.broadcastMessageSignal(0, 0, 106);
+                        rc.broadcastMessageSignal(enemies[i].location.x, enemies[i].location.y, 106);
+                    }
+                    else{
+                        rc.broadcastMessageSignal(0, 1, 106);
+                        rc.broadcastMessageSignal(enemies[i].location.x, enemies[i].location.y, 106);
+                    }
+
                 }
                 MapLocation[] parts = rc.sensePartLocations(106);
                 MapLocation close = home;

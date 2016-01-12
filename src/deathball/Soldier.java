@@ -7,7 +7,12 @@ import battlecode.common.*;
  */
 public class Soldier {
     public static void run(RobotController rc) {
+        int mode = 0; //chill
+        int destx = 0;
+        int desty = 0;
         try {
+            destx = rc.getLocation().x;
+            desty = rc.getLocation().y;
             // init stuff
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -88,6 +93,39 @@ public class Soldier {
                     } else if (rc.canMove(dirToMove)) {
                         // Move
                         rc.move(dirToMove);
+                    }
+                }
+
+                Signal msg = null;
+                Signal[] inbox = rc.emptySignalQueue();
+                for(int i = 0; i <inbox.length; i++){
+                    if(inbox[i].getTeam() == rc.getTeam()){
+                        if(inbox[i].getMessage()[0] == 9 && inbox[i].getMessage()[1] == 9){
+                            msg = inbox[i+1];
+                            break;
+                        }
+                    }
+                }
+                if(msg != null){
+                    destx = msg.getMessage()[0];
+                    desty = msg.getMessage()[1];
+                    mode = 2;
+                }
+                if(mode == 2) {
+                    MapLocation loc = new MapLocation(destx, desty);
+                    if (!loc.equals(rc.getLocation())) {
+                        if (rc.isCoreReady()) {
+                            if (rc.senseRubble(rc.getLocation().add(rc.getLocation().directionTo(loc))) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                                // Too much rubble, so I should clear it
+                                rc.clearRubble(rc.getLocation().directionTo(loc));
+                                // Check if I can move in this direction
+                            }
+                            // Check the rubble in that direction
+                            if (rc.canMove(rc.getLocation().directionTo(loc))) {
+                                // Move
+                                rc.move(rc.getLocation().directionTo(loc));
+                            }
+                        }
                     }
                 }
 
