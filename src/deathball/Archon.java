@@ -66,11 +66,14 @@ public class Archon {
                 RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), 53);
                 for (int i = 0; i < enemies.length; i++) {
                     if (rc.getLocation().distanceSquaredTo(enemies[i].location) <= 26) {
-                        if (rc.isCoreReady()) {
-                            // Check the rubble in that direction
-                            if (rc.canMove(enemies[i].location.directionTo(rc.getLocation()))) {
+                        Direction dir = enemies[i].location.directionTo(rc.getLocation());
+                        for(int j = 0; j < 8; j++) {
+                            if (rc.canMove(dir)) {
                                 // Move
-                                rc.move(enemies[i].location.directionTo(rc.getLocation()));
+                                rc.move(dir);
+                                break;
+                            } else {
+                                dir = dir.rotateRight();
                             }
                         }
                     } else {
