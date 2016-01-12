@@ -7,7 +7,6 @@ import battlecode.common.*;
  */
 public class Archon {
     public static void run(RobotController rc) {
-		int[] status = {0,0,0,0,0,0,0};
         int mode = 0;
         try {
             Direction dirToBuild = Direction.NORTH;
@@ -34,31 +33,24 @@ public class Archon {
         while (true) {
             try {
                 Direction dirToBuild = Direction.NORTH_WEST;
-                    RobotType typeToBuild = RobotType.GUARD;
-                    if (rc.getTeamParts() >= 30) {
-                        for (int i = 0; i < 8; i++) {
-                            if (status[i] == 0) {
-                                // If possible, build in this direction
-                                if (rc.canBuild(dirToBuild, typeToBuild)) {
-                                    rc.build(dirToBuild, typeToBuild);
-                                    status[i] = 1;
-                                    break;
-                                } else {
-                                    if (rc.canMove(dirToBuild.opposite())) {
-                                        // Move
-                                        rc.move(dirToBuild.opposite());
-                                    }
-                                }
-                            } else{
+                RobotType typeToBuild = RobotType.GUARD;
+                if (rc.getTeamParts() >= 30) {
+                    for (int i = 0; i < 8; i++) {
+                            // If possible, build in this direction
+                            if (rc.canBuild(dirToBuild, typeToBuild) ) {
+                                rc.build(dirToBuild, typeToBuild);
+                                break;
+                            }
+                            else {
                                 dirToBuild = dirToBuild.rotateRight();
                                 if (typeToBuild == RobotType.GUARD) {
                                     typeToBuild = RobotType.SOLDIER;
                                 } else {
                                     typeToBuild = RobotType.GUARD;
-                                }
                             }
                         }
                     }
+                }
                     Clock.yield();
             } catch (Exception e) {
                 System.out.println(e.getMessage());
