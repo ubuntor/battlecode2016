@@ -7,8 +7,8 @@ import battlecode.common.*;
  */
 public class Scout {
     public static void run(RobotController rc) {
-		MapLocation home = rc.getLocation();
-		Direction dirToMove = Direction.EAST;
+        MapLocation home = rc.getLocation();
+        Direction dirToMove = Direction.EAST;
         int spiralCount = 1;
         int stepCount = 7;
         try {
@@ -20,20 +20,24 @@ public class Scout {
         while (true) {
             try {
                 RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), 53);
-                if(enemies.length > 0){
                 for (int i = 0; i < enemies.length; i++) {
                     if (rc.getLocation().distanceSquaredTo(enemies[i].location) <= 26) {
                         if (rc.isCoreReady()) {
                             // Check the rubble in that direction
-                            Direction dir = enemies[i].location.directionTo(rc.getLocation());
-                            for(int j = 0; j < 8; j++) {
-                                if (rc.canMove(dir)) {
-                                    // Move
-                                    rc.move(dir);
-                                    break;
-                                } else {
-                                    dir = dir.rotateRight();
-                                }
+                        	Direction optimalAwayDir = enemies[i].location.directionTo(rc.getLocation());
+                            if (rc.canMove(optimalAwayDir)) {
+                                // Move away
+                            	rc.move(optimalAwayDir);
+                            } else {
+                            	if (rc.canMove(optimalAwayDir.rotateLeft()))
+                            		rc.move(optimalAwayDir.rotateLeft());
+                            	else if (rc.canMove(optimalAwayDir.rotateRight()))
+                            		rc.move(optimalAwayDir.rotateRight());
+                        		else if (rc.canMove(optimalAwayDir.rotateLeft().rotateLeft()))
+                        			rc.move(optimalAwayDir.rotateLeft().rotateLeft());
+                        		else if (rc.canMove(optimalAwayDir.rotateRight().rotateRight()))
+                        			rc.move(optimalAwayDir.rotateRight().rotateRight());
+                            	// if we still can't move then we're fucked lol
                             }
                         }
                     }
@@ -50,21 +54,22 @@ public class Scout {
                         rc.broadcastMessageSignal(enemies[i].location.x, enemies[i].location.y, 106);
                     }
                 }
-                }
-                if (rc.isCoreReady()) {
+
+                if (rc.isCoreReady() && rc.getHealth() > 50) { 
+                	// we have to be healthy before doing this spiral shit
                     // Check the rubble in that direction
                     if (rc.canMove(dirToMove)) {
                         // Move
                         rc.move(dirToMove);
                         stepCount--;
-                    }
-                    else{
+                    } else {
                         spiralCount++;
                         stepCount = spiralCount * 7 - stepCount;
                         dirToMove = dirToMove.rotateRight();
                         dirToMove = dirToMove.rotateRight();
                     }
                 }
+
                 if (stepCount == 0) {
                     spiralCount++;
                     stepCount = spiralCount * 7;

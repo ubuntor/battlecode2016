@@ -14,11 +14,9 @@ public class Archon {
         Random rand = new Random(rc.getID());
         int fate = rand.nextInt(1000);
         int mode = 0;
-        int destx = 0;
-        int desty = 0;
+        int destx = rc.getLocation().x;
+        int desty = rc.getLocation().y;
         try {
-            destx = rc.getLocation().x;
-            desty = rc.getLocation().y;
             Direction dirToBuild = Direction.NORTH;
             for (int i = 0; i < 8; i++) {
                 // If possible, build in this direction
@@ -71,14 +69,22 @@ public class Archon {
                 RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), 53);
                 for (int i = 0; i < enemies.length; i++) {
                     if (rc.getLocation().distanceSquaredTo(enemies[i].location) <= 26) {
-                        Direction dir = enemies[i].location.directionTo(rc.getLocation());
-                        for(int j = 0; j < 8; j++) {
-                            if (rc.canMove(dir)) {
-                                // Move
-                                rc.move(dir);
-                                break;
+                        if (rc.isCoreReady()) {
+                            // Check the rubble in that direction
+                            Direction optimalAwayDir = enemies[i].location.directionTo(rc.getLocation());
+                            if (rc.canMove(optimalAwayDir)) {
+                                // Move away
+                                rc.move(optimalAwayDir);
                             } else {
-                                dir = dir.rotateRight();
+                                if (rc.canMove(optimalAwayDir.rotateLeft()))
+                                    rc.move(optimalAwayDir.rotateLeft());
+                                else if (rc.canMove(optimalAwayDir.rotateRight()))
+                                    rc.move(optimalAwayDir.rotateRight());
+                                else if (rc.canMove(optimalAwayDir.rotateLeft().rotateLeft()))
+                                    rc.move(optimalAwayDir.rotateLeft().rotateLeft());
+                                else if (rc.canMove(optimalAwayDir.rotateRight().rotateRight()))
+                                    rc.move(optimalAwayDir.rotateRight().rotateRight());
+                                // if we still can't move then we're fucked lol
                             }
                         }
                     } else {
@@ -154,6 +160,14 @@ public class Archon {
                 Direction dirToMove;
                 if(!closest.equals(rc.getLocation())){
                     dirToMove = rc.getLocation().directionTo(closest);
+                    if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                        // Too much rubble, so I should clear it
+                        rc.clearRubble(dirToMove);
+                        // Check if I can move in this direction
+                    } else if (rc.canMove(dirToMove)) {
+                        // Move
+                        rc.move(dirToMove);
+                    }
                     rc.broadcastMessageSignal(9, 9, 70);
                     rc.broadcastMessageSignal(closest.x, closest.y, 70);
                 }
@@ -161,14 +175,7 @@ public class Archon {
                     dirToMove = directions[fate % 8];
                 }
                 // Check the rubble in that direction
-                if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
-                    // Too much rubble, so I should clear it
-                    rc.clearRubble(dirToMove);
-                    // Check if I can move in this direction
-                } else if (rc.canMove(dirToMove)) {
-                    // Move
-                    rc.move(dirToMove);
-                }
+
                 Clock.yield();
             } catch (Exception e) {
                 System.out.println(e.getMessage());
