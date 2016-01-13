@@ -15,11 +15,9 @@ public class Guard {
         Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST,
                 Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
         int mode = 0; //chill
-        int destx = 0;
-        int desty = 0;
+        int destx = rc.getLocation().x;
+        int desty = rc.getLocation().y;
         try {
-            destx = rc.getLocation().x;
-            desty = rc.getLocation().y;
         } catch (Exception e) {
             System.out.println(e.getMessage());
             e.printStackTrace();

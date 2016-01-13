@@ -14,11 +14,9 @@ public class Archon {
         Random rand = new Random(rc.getID());
         int fate = rand.nextInt(1000);
         int mode = 0;
-        int destx = 0;
-        int desty = 0;
+        int destx = rc.getLocation().x;
+        int desty = rc.getLocation().y;
         try {
-            destx = rc.getLocation().x;
-            desty = rc.getLocation().y;
             Direction dirToBuild = Direction.NORTH;
             for (int i = 0; i < 8; i++) {
                 // If possible, build in this direction
