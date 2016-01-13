@@ -46,8 +46,7 @@ public class Archon {
                     RobotType typeToBuild = RobotType.GUARD;
                     if (Math.random() * rc.getRoundNum() / 3000 >= 0.95 && rc.getTeamParts() >= 40) {
                         typeToBuild = RobotType.SCOUT;
-                    }
-                    else if (Math.random() > 0.75) {
+                    } else if (Math.random() > 0.75) {
                         typeToBuild = RobotType.SOLDIER;
                     }
                     for (int i = 0; i < 8; i++) {
@@ -90,8 +89,7 @@ public class Archon {
                     } else {
                         int x = enemies[i].location.x;
                         int y = enemies[i].location.y;
-                        rc.broadcastMessageSignal(9, 9, 70); //attaaack
-                        rc.broadcastMessageSignal(x, y, 70);
+                        Utils.broadcast4(rc, 9, 9, x, y, 70);
                         if (rc.getTeamParts() <= 30) {
                             destx = x;
                             desty = y;
@@ -105,13 +103,14 @@ public class Archon {
                 int lvl = 0;
                 Signal[] inbox = rc.emptySignalQueue();
                 for (int i = 0; i < inbox.length; i++) {
-                    lvl = 0;
                     if (inbox[i].getTeam() == rc.getTeam()) {
-                        if (inbox[i].getMessage()[0] == 0 && inbox[i].getMessage()[1] == 0) {
+                        int[] numbers = Utils.unpack4(inbox[i]);
+                        lvl = 0;
+                        if (numbers[0] == 0 && numbers[1] == 0) {
                             lvl = 4; //enemy
-                        } else if (inbox[i].getMessage()[0] == 1 && inbox[i].getMessage()[1] == 0) {
+                        } else if (numbers[0] == 1 && numbers[1] == 0) {
                             lvl = 3; //parts
-                        } else if (inbox[i].getMessage()[0] == 0 && inbox[i].getMessage()[1] == 1) {
+                        } else if (numbers[0] == 0 && numbers[1] == 1) {
                             lvl = 2; //zombie
                         } else if (lvl > priority) {
                             msg = inbox[i];
@@ -120,10 +119,10 @@ public class Archon {
                     }
                 }
                 if (msg != null) {
-                    int x = msg.getMessage()[0];
-                    int y = msg.getMessage()[1];
-                    rc.broadcastMessageSignal(9, 9, 70); //attack command
-                    rc.broadcastMessageSignal(x, y, 70);
+                    int[] numbers = Utils.unpack4(msg);
+                    int x = numbers[0];
+                    int y = numbers[1];
+                    Utils.broadcast4(rc, 9, 9, x, y, 70);
                     if ((priority == 4 || priority == 3) && rc.getTeamParts() <= 30) {
                         destx = x;
                         desty = y;
@@ -151,14 +150,14 @@ public class Archon {
                 MapLocation[] scrap = rc.sensePartLocations(35);
                 MapLocation closest = rc.getLocation();
                 double distance = 999.000;
-                for(int i = 0; i < scrap.length; i++){
-                    if(scrap[i].distanceSquaredTo(rc.getLocation()) <= distance){
+                for (int i = 0; i < scrap.length; i++) {
+                    if (scrap[i].distanceSquaredTo(rc.getLocation()) <= distance) {
                         closest = scrap[i];
                         distance = scrap[i].distanceSquaredTo(rc.getLocation());
                     }
                 }
                 Direction dirToMove;
-                if(!closest.equals(rc.getLocation())){
+                if (!closest.equals(rc.getLocation())) {
                     dirToMove = rc.getLocation().directionTo(closest);
                     if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
                         // Too much rubble, so I should clear it
@@ -168,10 +167,8 @@ public class Archon {
                         // Move
                         rc.move(dirToMove);
                     }
-                    rc.broadcastMessageSignal(9, 9, 70);
-                    rc.broadcastMessageSignal(closest.x, closest.y, 70);
-                }
-                else {
+                    Utils.broadcast4(rc, 9, 9, closest.x, closest.y, 70);
+                } else {
                     dirToMove = directions[fate % 8];
                 }
                 // Check the rubble in that direction
