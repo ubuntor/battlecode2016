@@ -10,14 +10,14 @@ import java.lang.Math;
  */
 public class Soldier {
     public static void run(RobotController rc) {
+        Random rand = new Random(rc.getID());
+        int fate = rand.nextInt(1000);
         Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST,
                 Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
         int mode = 0; //chill
-        int destx = 0;
-        int desty = 0;
+        int destx = rc.getLocation().x;
+        int desty = rc.getLocation().y;
         try {
-            destx = rc.getLocation().x;
-            desty = rc.getLocation().y;
             // init stuff
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -134,18 +134,15 @@ public class Soldier {
                     }
                 }
                 //patrol
-                int rand = (int)(Math.random()*8);
-                Direction dir = directions[rand];
-
-                if (rc.senseRubble(rc.getLocation().add(dir)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
-                    // Too much rubble, so I should clear it
-                    rc.clearRubble(dir);
-                    // Check if I can move in this direction
-                }
+                Direction dirToMove = directions[fate % 8];
                 // Check the rubble in that direction
-                if (rc.canMove(dir)) {
+                if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                    // Too much rubble, so I should clear it
+                    rc.clearRubble(dirToMove);
+                    // Check if I can move in this direction
+                } else if (rc.canMove(dirToMove)) {
                     // Move
-                    rc.move(dir);
+                    rc.move(dirToMove);
                 }
 
                 Clock.yield();

@@ -20,14 +20,24 @@ public class Scout {
         while (true) {
             try {
                 RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), 53);
-
                 for (int i = 0; i < enemies.length; i++) {
                     if (rc.getLocation().distanceSquaredTo(enemies[i].location) <= 26) {
                         if (rc.isCoreReady()) {
                             // Check the rubble in that direction
-                            if (rc.canMove(enemies[i].location.directionTo(rc.getLocation()))) {
-                                // Move
-                                rc.move(enemies[i].location.directionTo(rc.getLocation()));
+                        	Direction optimalAwayDir = enemies[i].location.directionTo(rc.getLocation());
+                            if (rc.canMove(optimalAwayDir)) {
+                                // Move away
+                            	rc.move(optimalAwayDir);
+                            } else {
+                            	if (rc.canMove(optimalAwayDir.rotateLeft()))
+                            		rc.move(optimalAwayDir.rotateLeft());
+                            	else if (rc.canMove(optimalAwayDir.rotateRight()))
+                            		rc.move(optimalAwayDir.rotateRight());
+                        		else if (rc.canMove(optimalAwayDir.rotateLeft().rotateLeft()))
+                        			rc.move(optimalAwayDir.rotateLeft().rotateLeft());
+                        		else if (rc.canMove(optimalAwayDir.rotateRight().rotateRight()))
+                        			rc.move(optimalAwayDir.rotateRight().rotateRight());
+                            	// if we still can't move then we're fucked lol
                             }
                         }
                     }
@@ -45,7 +55,8 @@ public class Scout {
                     }
                 }
 
-                if (rc.isCoreReady()) {
+                if (rc.isCoreReady() && rc.getHealth() > 50) { 
+                	// we have to be healthy before doing this spiral shit
                     // Check the rubble in that direction
                     if (rc.canMove(dirToMove)) {
                         // Move
@@ -66,31 +77,29 @@ public class Scout {
                 }
 
                 RobotInfo[] neutrals = rc.senseNearbyRobots(rc.getLocation(), 53, Team.NEUTRAL);
-
-                if (neutrals.length > 0) {
-                    RobotInfo closen = neutrals[0];
-                    int mind = closen.location.distanceSquaredTo(home);
+                if(neutrals.length > 0) {
+                    RobotInfo closen = null;
                     for (int i = 0; i < neutrals.length; i++) {
-                        int nd = neutrals[i].location.distanceSquaredTo(home);
-                        if (nd < mind) {
+                        if (i == 0) {
                             closen = neutrals[i];
-                            mind = nd;
+                        } else if (neutrals[i].location.distanceSquaredTo(home) <= closen.location.distanceSquaredTo(home)) {
+                            closen = neutrals[i];
                         }
                     }
-                    rc.broadcastMessageSignal(1, 0, 106);
-                    rc.broadcastMessageSignal(closen.location.x, closen.location.y, 106);
+                    if (!closen.location.equals(home)) {
+                        rc.broadcastMessageSignal(1, 0, 106);
+                        rc.broadcastMessageSignal(closen.location.x, closen.location.y, 106);
+                    }
                 }
 
                 MapLocation[] parts = rc.sensePartLocations(106);
-
-                if (parts.length > 0) {
-                    MapLocation close = parts[0];
-                    int mind = close.distanceSquaredTo(home);
+                if(parts.length > 0) {
+                    MapLocation close = home;
                     for (int i = 0; i < parts.length; i++) {
-                        int nd = parts[i].distanceSquaredTo(home);
-                        if (nd < mind) {
+                        if (i == 0) {
                             close = parts[i];
-                            mind = nd;
+                        } else if (parts[i].distanceSquaredTo(home) <= close.distanceSquaredTo(home)) {
+                            close = parts[i];
                         }
                     }
                     if (!close.equals(home)) {
@@ -98,7 +107,6 @@ public class Scout {
                         rc.broadcastMessageSignal(close.x, close.y, 106);
                     }
                 }
-
                 Clock.yield();
             } catch (Exception e) {
                 System.out.println(e.getMessage());
