@@ -103,18 +103,16 @@ public class Soldier {
 
                 Signal msg = null;
                 Signal[] inbox = rc.emptySignalQueue();
-                for(int i = 0; i <inbox.length; i++){
-                    if(inbox[i].getTeam() == rc.getTeam()){
-                        if(inbox[i].getMessage()[0] == 9 && inbox[i].getMessage()[1] == 9){
-                            msg = inbox[i+1];
+                for (int i = 0; i < inbox.length; i++) {
+                    if (inbox[i].getTeam() == rc.getTeam()) {
+                        int[] numbers = Utils.unpack4(inbox[i]);
+                        if (numbers[0] == 9 && numbers[1] == 9) {
+                            destx = numbers[2];
+                            desty = numbers[3];
+                            mode = 2;
                             break;
                         }
                     }
-                }
-                if(msg != null){
-                    destx = msg.getMessage()[0];
-                    desty = msg.getMessage()[1];
-                    mode = 2;
                 }
                 if(mode == 2) {
                     MapLocation loc = new MapLocation(destx, desty);
