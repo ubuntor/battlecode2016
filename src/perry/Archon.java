@@ -28,130 +28,136 @@ public class Archon {
         }
         while (true) {
             try {
-                dirToMove = Direction.NORTH;
-                //run the fuck away if you see an enemy
-                int distance = 999;
-                RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), 53);
-                RobotInfo closestEnemy = null;
-                for (int i = 0; i < enemies.length; i++) {
-                    if(enemies[i].location.distanceSquaredTo(rc.getLocation()) < distance){
-                        closestEnemy = enemies[i];
-                        distance = enemies[i].location.distanceSquaredTo(rc.getLocation());
+                if(rc.isCoreReady()) {
+                    //run the fuck away if you see an enemy
+                    int neutralDistance = 999;
+                    RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), 53);
+                    if(enemies.length > 0){
+                        int enemyDistance = 999;
+                        RobotInfo closestEnemy = null;
+                        for (int i = 0; i < enemies.length; i++) {
+                            if (enemies[i].location.distanceSquaredTo(rc.getLocation()) < enemyDistance) {
+                                closestEnemy = enemies[i];
+                                enemyDistance = enemies[i].location.distanceSquaredTo(rc.getLocation());
+                            }
+                        }
+                        if (!closestEnemy.equals(null)) {
+                            dirToMove = closestEnemy.location.directionTo(rc.getLocation());
+                            if (rc.canMove(dirToMove)) {
+                                // Move away
+                                rc.move(dirToMove);
+                            } else {
+                                if (rc.canMove(dirToMove.rotateLeft()))
+                                    rc.move(dirToMove.rotateLeft());
+                                else if (rc.canMove(dirToMove.rotateRight()))
+                                    rc.move(dirToMove.rotateRight());
+                                else if (rc.canMove(dirToMove.rotateLeft().rotateLeft()))
+                                    rc.move(dirToMove.rotateLeft().rotateLeft());
+                                else if (rc.canMove(dirToMove.rotateRight().rotateRight()))
+                                    rc.move(dirToMove.rotateRight().rotateRight());
+                                // if we still can't move then we're fucked lol
+                            }
+                        }
                     }
-                }
-                if(enemies.length > 0) {
-                    if (rc.isCoreReady()) {
-                        // Check the rubble in that direction
-                        dirToMove = closestEnemy.location.directionTo(rc.getLocation());
-                        if (rc.canMove(dirToMove)) {
-                            // Move away
-                            rc.move(dirToMove);
-                        } else {
-                            if (rc.canMove(dirToMove.rotateLeft()))
-                                rc.move(dirToMove.rotateLeft());
-                            else if (rc.canMove(dirToMove.rotateRight()))
-                                rc.move(dirToMove.rotateRight());
-                            else if (rc.canMove(dirToMove.rotateLeft().rotateLeft()))
-                                rc.move(dirToMove.rotateLeft().rotateLeft());
-                            else if (rc.canMove(dirToMove.rotateRight().rotateRight()))
-                                rc.move(dirToMove.rotateRight().rotateRight());
-                            // if we still can't move then we're fucked lol
+                    else {
+                        //neutrals
+                        RobotInfo[] bots = rc.senseNearbyRobots(53, Team.NEUTRAL);
+                        if(bots.length > 0){
+                            RobotInfo closestNeutral = null;
+                            for(int i = 0; i < bots.length; i++) {
+                                if (bots[i].team.equals(Team.NEUTRAL) && bots[i].location.distanceSquaredTo(rc.getLocation()) < neutralDistance) {
+                                    if (bots[i].location.distanceSquaredTo(rc.getLocation()) <= 2) {
+                                        rc.activate(bots[i].location);
+                                    } else if (bots[i].location.distanceSquaredTo(rc.getLocation()) < neutralDistance) {
+                                        closestNeutral = bots[i];
+                                        neutralDistance = bots[i].location.distanceSquaredTo(rc.getLocation());
+                                    }
+                                }
+                            }
+                            if (!closestNeutral.equals(null) && targetSet <= 2) {
+                                destx = closestNeutral.location.x;
+                                desty = closestNeutral.location.y;
+                                targetSet = 2; //neutral
+                            }
+                        }
+                    }
+                    //build
+                    if(rc.isCoreReady()) {
+                        if (buildStatus == 0 && rc.getTeamParts() >= (RobotType.TURRET.partCost + RobotType.SCOUT.partCost)) {
+                            dirToBuild = directions[rand.nextInt(8)];
+                            for (int i = 0; i < 8; i++) {
+                                if (rc.canBuild(dirToBuild, RobotType.TURRET)) {
+                                    rc.build(dirToBuild, RobotType.TURRET);
+                                    turretID = rc.senseRobotAtLocation(rc.getLocation().add(dirToBuild)).ID;
+                                    buildStatus = 1; //turret needs spotter
+                                    break;
+                                } else {
+                                    dirToBuild.rotateRight();
+                                }
+                            }
+                        } else if (buildStatus == 1 && rc.getTeamParts() >= RobotType.SCOUT.partCost) {
+                            dirToBuild = directions[rand.nextInt(8)];
+                            for (int i = 0; i < 8; i++) {
+                                if (rc.canBuild(dirToBuild, RobotType.SCOUT)) {
+                                    rc.build(dirToBuild, RobotType.SCOUT);
+                                    scoutID = rc.senseRobotAtLocation(rc.getLocation().add(dirToBuild)).ID;
+                                    buildStatus = 0;
+                                    //ADD BROADCAST
+                                    break;
+                                } else {
+                                    dirToBuild.rotateRight();
+                                }
+                            }
+                        } else if (buildStatus == 0 && rc.getTeamParts() >= RobotType.SOLDIER.partCost) {
+                            dirToBuild = directions[rand.nextInt(8)];
+                            for (int i = 0; i < 8; i++) {
+                                if (rc.canBuild(dirToBuild, RobotType.SOLDIER)) {
+                                    rc.build(dirToBuild, RobotType.SOLDIER);
+                                    break;
+                                } else {
+                                    dirToBuild.rotateRight();
+                                }
+                            }
+                        }
+                    }
+                    //move towards objective
+                    if(rc.isCoreReady()) {
+                        if (closestEnemy.equals(null) && targetSet > 0) {
+                            MapLocation target = new MapLocation(destx, desty);
+                            if (rc.getLocation().equals(target)) {
+                                targetSet = 0;
+                                break;
+                            } else {
+                                dirToMove = rc.getLocation().directionTo(target);
+                                if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                                    // Too much rubble, so I should clear it
+                                    rc.clearRubble(dirToMove);
+                                    // Check if I can move in this direction
+                                } else if (rc.canMove(dirToMove)) {
+                                    // Move
+                                    rc.move(dirToMove);
+                                }
+                            }
+                        }
+                    }
+                    //scrap
+                    if(rc.isCoreReady()) {
+                        int distance = 999;
+                        MapLocation closestScrap = null;
+                        MapLocation[] scrap = rc.sensePartLocations(53);
+                        for (int i = 0; i < scrap.length; i++) {
+                            if (scrap[i].distanceSquaredTo(rc.getLocation()) < distance) {
+                                closestScrap = scrap[i];
+                                distance = scrap[i].distanceSquaredTo(rc.getLocation());
+                            }
+                        }
+                        if (!closestScrap.equals(null) && targetSet <= 1) {
+                            destx = closestScrap.x;
+                            desty = closestScrap.y;
+                            targetSet = 1; //scrap
                         }
                     }
                 }
-                //move towards objective
-                if(enemies.length == 0) {
-                    MapLocation target = new MapLocation(destx, desty);
-                    if (!rc.getLocation().equals(target)) {
-                        dirToMove = rc.getLocation().directionTo(target);
-                        if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
-                            // Too much rubble, so I should clear it
-                            rc.clearRubble(dirToMove);
-                            // Check if I can move in this direction
-                        } else if (rc.canMove(dirToMove)) {
-                            // Move
-                            rc.move(dirToMove);
-                        }
-                    }
-                }
-
-                //neutrals
-                RobotInfo[] bots = rc.senseNearbyRobots(2, Team.NEUTRAL);
-                for (int i = 0; i < bots.length; i++) {
-                    rc.activate(bots[i].location);
-                }
-                distance = 999;
-                RobotInfo closestNeutral = null;
-                bots = rc.senseNearbyRobots(53, Team.NEUTRAL);
-                for (int i = 0; i < bots.length; i++) {
-                    if(bots[i].location.distanceSquaredTo(rc.getLocation()) < distance){
-                        closestNeutral = bots[i];
-                        distance = bots[i].location.distanceSquaredTo(rc.getLocation());
-                    }
-                }
-                if(!closestNeutral.equals(null) && targetSet <= 2){
-                    destx = closestNeutral.location.x;
-                    desty = closestNeutral.location.y;
-                    targetSet = 2; //neutral
-                }
-
-                //build
-                if(buildStatus == 0 && rc.getTeamParts()>=(RobotType.TURRET.partCost + RobotType.SCOUT.partCost)){
-                    dirToBuild = directions[rand.nextInt(8)];
-                    for(int i = 0; i < 8; i++) {
-                        if (rc.canBuild(dirToBuild, RobotType.TURRET)) {
-                            rc.build(dirToBuild, RobotType.TURRET);
-                            turretID = rc.senseRobotAtLocation(rc.getLocation().add(dirToBuild)).ID;
-                            buildStatus = 1; //turret needs spotter
-                            break;
-                        }
-                        else{
-                            dirToBuild.rotateRight();
-                        }
-                    }
-                }else if(buildStatus == 1 && rc.getTeamParts()>=RobotType.SCOUT.partCost){
-                    dirToBuild = directions[rand.nextInt(8)];
-                    for(int i = 0; i < 8; i++) {
-                        if (rc.canBuild(dirToBuild, RobotType.SCOUT)) {
-                            rc.build(dirToBuild, RobotType.SCOUT);
-                            scoutID = rc.senseRobotAtLocation(rc.getLocation().add(dirToBuild)).ID;
-                            buildStatus = 0;
-                            //broadcast????
-                            break;
-                        }
-                        else{
-                            dirToBuild.rotateRight();
-                        }
-                    }
-                }else if(buildStatus == 0 && rc.getTeamParts()>=RobotType.SOLDIER.partCost){
-                    dirToBuild = directions[rand.nextInt(8)];
-                    for(int i = 0; i < 8; i++) {
-                        if (rc.canBuild(dirToBuild, RobotType.SOLDIER)) {
-                            rc.build(dirToBuild, RobotType.SOLDIER);
-                            break;
-                        }
-                        else{
-                            dirToBuild.rotateRight();
-                        }
-                    }
-                }
-
-                //scrap
-                distance = 999;
-                MapLocation closestScrap = null;
-                MapLocation[] scrap = rc.sensePartLocations(53);
-                for (int i = 0; i < scrap.length; i++) {
-                    if(scrap[i].distanceSquaredTo(rc.getLocation()) < distance){
-                        closestScrap = scrap[i];
-                        distance = scrap[i].distanceSquaredTo(rc.getLocation());
-                    }
-                }
-                if(!closestScrap.equals(null) && targetSet <= 1){
-                    destx = closestNeutral.location.x;
-                    desty = closestNeutral.location.y;
-                    targetSet = 1; //scrap
-                }
-
                 Clock.yield();
             } catch (Exception e) {
                 System.out.println(e.getMessage());

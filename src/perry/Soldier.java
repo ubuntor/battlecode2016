@@ -27,8 +27,9 @@ public class Soldier {
         }
         while (true) {
             try {
+                //attack
                 int heuristic = -1;
-                int val = 0;
+                int val;
                 MapLocation maxloc = rc.getLocation();
                 RobotInfo[] attackable = rc.senseHostileRobots(rc.getLocation(), 13);
                 for(int i = 0; i < attackable.length; i++){
@@ -61,38 +62,61 @@ public class Soldier {
                 if(rc.isWeaponReady() && !maxloc.equals(rc.getLocation())){
                     rc.attackLocation(maxloc);
                 }
-                heuristic = -1;
-                maxloc = rc.getLocation();
-                RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), 24);
-                for(int i = 0; i < enemies.length; i++){
-                    val = 0;
-                    if(enemies[i].type == RobotType.GUARD || enemies[i].type == RobotType.ARCHON){
-                        val = 4;
-                    } else if(enemies[i].type == RobotType.TTM){
-                        val = 5;
-                    } else if(enemies[i].type == RobotType.SOLDIER){
-                        val = 6;
-                    } else if(enemies[i].type == RobotType.TURRET){
-                        val = 7;
-                    } else if(enemies[i].type == RobotType.VIPER){
-                        val = 8;
-                    } if (enemies[i].health <= 16) {
-                        val *= 2;
+                //micro
+                else {
+                    int distance = 999;
+                    RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), 24);
+                    RobotInfo closestEnemy = null;
+                    for (int i = 0; i < enemies.length; i++) {
+                        if (enemies[i].team.equals(rc.getTeam().opponent()) && enemies[i].location.distanceSquaredTo(rc.getLocation()) < distance) {
+                            closestEnemy = enemies[i];
+                            distance = enemies[i].location.distanceSquaredTo(rc.getLocation());
+                        }
                     }
-                    if(enemies[i].type == RobotType.FASTZOMBIE || enemies[i].type == RobotType.BIGZOMBIE){
-                        val = 1;
-                    } else if(enemies[i].type == RobotType.STANDARDZOMBIE) {
-                        val = 2;
-                    } else if(enemies[i].type == RobotType.RANGEDZOMBIE){
-                        val = 3;
+                    //run away
+                    if (!closestEnemy.equals(null) && distance <= rc.getType().attackRadiusSquared) {
+                        Direction dirToMove = closestEnemy.location.directionTo(rc.getLocation());
+                        if (rc.canMove(dirToMove)) {
+                            // Move away
+                            rc.move(dirToMove);
+                        } else {
+                            if (rc.canMove(dirToMove.rotateLeft()))
+                                rc.move(dirToMove.rotateLeft());
+                            else if (rc.canMove(dirToMove.rotateRight()))
+                                rc.move(dirToMove.rotateRight());
+                            else if (rc.canMove(dirToMove.rotateLeft().rotateLeft()))
+                                rc.move(dirToMove.rotateLeft().rotateLeft());
+                            else if (rc.canMove(dirToMove.rotateRight().rotateRight()))
+                                rc.move(dirToMove.rotateRight().rotateRight());
+                            // if we still can't move then we're fucked lol
+                        }
                     }
-                    if( val > heuristic){
-                        maxloc = enemies[i].location;
-                        heuristic = val;
+                    //run to
+                    else if (!closestEnemy.equals(null) && distance > rc.getType().attackRadiusSquared){
+                        Direction dirToMove = rc.getLocation().directionTo(closestEnemy.location);
+                        if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                            // Too much rubble, so I should clear it
+                            rc.clearRubble(dirToMove);
+                            // Check if I can move in this direction
+                        } else if (rc.canMove(dirToMove)) {
+                            // Move
+                            rc.move(dirToMove);
+                        }
                     }
-                }
-                if(rc.isCoreReady()){
-                    Direction dirToMove = rc.getLocation().directionTo(maxloc);
+                    if (rc.isCoreReady()) {
+                        Direction dirToMove = rc.getLocation().directionTo(maxloc);
+                        if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                            // Too much rubble, so I should clear it
+                            rc.clearRubble(dirToMove);
+                            // Check if I can move in this direction
+                        } else if (rc.canMove(dirToMove)) {
+                            // Move
+                            rc.move(dirToMove);
+                        }
+                    }
+                    //patrol
+                    Direction dirToMove = directions[fate % 8];
+                    // Check the rubble in that direction
                     if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
                         // Too much rubble, so I should clear it
                         rc.clearRubble(dirToMove);
@@ -102,51 +126,6 @@ public class Soldier {
                         rc.move(dirToMove);
                     }
                 }
-
-                Signal msg = null;
-                Signal[] inbox = rc.emptySignalQueue();
-                for(int i = 0; i <inbox.length; i++){
-                    if(inbox[i].getTeam() == rc.getTeam()){
-                        if(inbox[i].getMessage()[0] == 9 && inbox[i].getMessage()[1] == 9){
-                            msg = inbox[i+1];
-                            break;
-                        }
-                    }
-                }
-                if(msg != null){
-                    destx = msg.getMessage()[0];
-                    desty = msg.getMessage()[1];
-                    mode = 2;
-                }
-                if(mode == 2) {
-                    MapLocation loc = new MapLocation(destx, desty);
-                    if (!loc.equals(rc.getLocation())) {
-                        if (rc.isCoreReady()) {
-                            if (rc.senseRubble(rc.getLocation().add(rc.getLocation().directionTo(loc))) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
-                                // Too much rubble, so I should clear it
-                                rc.clearRubble(rc.getLocation().directionTo(loc));
-                                // Check if I can move in this direction
-                            }
-                            // Check the rubble in that direction
-                            if (rc.canMove(rc.getLocation().directionTo(loc))) {
-                                // Move
-                                rc.move(rc.getLocation().directionTo(loc));
-                            }
-                        }
-                    }
-                }
-                //patrol
-                Direction dirToMove = directions[fate % 8];
-                // Check the rubble in that direction
-                if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
-                    // Too much rubble, so I should clear it
-                    rc.clearRubble(dirToMove);
-                    // Check if I can move in this direction
-                } else if (rc.canMove(dirToMove)) {
-                    // Move
-                    rc.move(dirToMove);
-                }
-
                 Clock.yield();
             } catch (Exception e) {
                 System.out.println(e.getMessage());
