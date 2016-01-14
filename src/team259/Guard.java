@@ -15,11 +15,9 @@ public class Guard {
         Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST,
                 Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
         int mode = 0; //chill
-        int destx = 0;
-        int desty = 0;
+        int destx = rc.getLocation().x;
+        int desty = rc.getLocation().y;
         try {
-            destx = rc.getLocation().x;
-            desty = rc.getLocation().y;
         } catch (Exception e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
@@ -107,16 +105,14 @@ public class Guard {
                 Signal[] inbox = rc.emptySignalQueue();
                 for (int i = 0; i < inbox.length; i++) {
                     if (inbox[i].getTeam() == rc.getTeam()) {
-                        if (inbox[i].getMessage()[0] == 9 && inbox[i].getMessage()[1] == 9) {
-                            msg = inbox[i + 1];
+                        int[] numbers = Utils.unpack4(inbox[i]);
+                        if (numbers[0] == 9 && numbers[1] == 9) {
+                            destx = numbers[2];
+                            desty = numbers[3];
+                            mode = 2;
                             break;
                         }
                     }
-                }
-                if (msg != null) {
-                    destx = msg.getMessage()[0];
-                    desty = msg.getMessage()[1];
-                    mode = 2; //attack
                 }
                 if (mode == 2) {
                     MapLocation loc = new MapLocation(destx, desty);

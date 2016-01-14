@@ -122,7 +122,7 @@ public class Archon {
                     }
                     //move towards objective
                     if(rc.isCoreReady()) {
-                        if (closestEnemy.equals(null) && targetSet > 0) {
+                        if (targetSet > 0) {
                             MapLocation target = new MapLocation(destx, desty);
                             if (rc.getLocation().equals(target)) {
                                 targetSet = 0;
