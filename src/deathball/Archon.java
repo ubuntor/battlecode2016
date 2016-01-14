@@ -40,30 +40,6 @@ public class Archon {
         }
         while (true) {
             try {
-                //build
-                if (rc.getTeamParts() >= 30) {
-                    Direction dirToBuild = Direction.NORTH;
-                    RobotType typeToBuild = RobotType.GUARD;
-                    if (Math.random() * rc.getRoundNum() / 3000 >= 0.95 && rc.getTeamParts() >= 40) {
-                        typeToBuild = RobotType.SCOUT;
-                    } else if (Math.random() > 0.75) {
-                        typeToBuild = RobotType.SOLDIER;
-                    }
-                    for (int i = 0; i < 8; i++) {
-                        // If possible, build in this direction
-                        if (rc.canBuild(dirToBuild, typeToBuild)) {
-                            rc.build(dirToBuild, typeToBuild);
-                            break;
-                        } else {
-                            dirToBuild = dirToBuild.rotateRight();
-                        }
-                    }
-                }
-                //neutrals
-                RobotInfo[] bots = rc.senseNearbyRobots(2, Team.NEUTRAL);
-                for (int i = 0; i < bots.length; i++) {
-                    rc.activate(bots[i].location);
-                }
                 //enemies
                 RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), 53);
                 for (int i = 0; i < enemies.length; i++) {
@@ -90,12 +66,31 @@ public class Archon {
                         int x = enemies[i].location.x;
                         int y = enemies[i].location.y;
                         Utils.broadcast4(rc, 9, 9, x, y, 70);
-                        if (rc.getTeamParts() <= 30) {
-                            destx = x;
-                            desty = y;
-                            mode = 2; //combat mode
+                    }
+                }
+                //build
+                if (rc.getTeamParts() >= 30) {
+                    Direction dirToBuild = Direction.NORTH;
+                    RobotType typeToBuild = RobotType.GUARD;
+                    if (rand.nextInt(3000) <= rc.getRoundNum()*0.95 && rc.getTeamParts() >= 40) {
+                        typeToBuild = RobotType.SCOUT;
+                    } else if (rand.nextDouble() > 0.75) {
+                        typeToBuild = RobotType.SOLDIER;
+                    }
+                    for (int i = 0; i < 8; i++) {
+                        // If possible, build in this direction
+                        if (rc.canBuild(dirToBuild, typeToBuild)) {
+                            rc.build(dirToBuild, typeToBuild);
+                            break;
+                        } else {
+                            dirToBuild = dirToBuild.rotateRight();
                         }
                     }
+                }
+                //neutrals
+                RobotInfo[] bots = rc.senseNearbyRobots(2, Team.NEUTRAL);
+                for (int i = 0; i < bots.length; i++) {
+                    rc.activate(bots[i].location);
                 }
                 //read
                 Signal msg = null;

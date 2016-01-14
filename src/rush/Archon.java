@@ -58,23 +58,24 @@ public class Archon {
                         if(bots.length > 0){
                             rc.activate(bots[0].location);
                         }
-                    }
-                    //build
-                    if(rc.isCoreReady()) {
-                        if (rc.getTeamParts() >= RobotType.SOLDIER.partCost) {
-                            dirToBuild = directions[rand.nextInt(8)];
-                            for (int i = 0; i < 8; i++) {
-                                if (rc.canBuild(dirToBuild, RobotType.SOLDIER)) {
-                                    rc.build(dirToBuild, RobotType.SOLDIER);
-                                    break;
-                                } else {
-                                    dirToBuild.rotateRight();
+                        else{
+                            //build
+                            if(rc.isCoreReady()) {
+                                if (rc.getTeamParts() >= RobotType.SOLDIER.partCost) {
+                                    dirToBuild = directions[rand.nextInt(8)];
+                                    for (int i = 0; i < 8; i++) {
+                                        if (rc.canBuild(dirToBuild, RobotType.SOLDIER)) {
+                                            rc.build(dirToBuild, RobotType.SOLDIER);
+                                            break;
+                                        } else {
+                                            dirToBuild.rotateRight();
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                     //move towards objective
-
                 }
                 Clock.yield();
             } catch (Exception e) {
