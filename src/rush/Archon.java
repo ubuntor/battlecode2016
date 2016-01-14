@@ -29,7 +29,7 @@ public class Archon {
                         int enemyDistance = 999;
                         RobotInfo closestEnemy = null;
                         for (int i = 0; i < enemies.length; i++) {
-                            if (enemies[i].location.distanceSquaredTo(rc.getLocation()) < enemyDistance) {
+                            if (enemies[i].location.distanceSquaredTo(rc.getLocation()) < enemyDistance && !enemies[i].type.equals(RobotType.ARCHON)) {
                                 closestEnemy = enemies[i];
                                 enemyDistance = enemies[i].location.distanceSquaredTo(rc.getLocation());
                             }
