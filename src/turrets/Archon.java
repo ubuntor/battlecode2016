@@ -9,8 +9,7 @@ import java.util.Random;
  */
 public class Archon {
     public static void run(RobotController rc) {
-        Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST,
-                Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
+        Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST, Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
         Direction dirToBuild;
         Direction dirToMove;
         Random rand = new Random(rc.getID());
@@ -31,7 +30,7 @@ public class Archon {
         }
         while (true) {
             try {
-                if(mode != 0){
+                if(mode != 0){ //not home base
                     //neutrals
                     RobotInfo[] bots = rc.senseNearbyRobots(2, Team.NEUTRAL);
                     for (int i = 0; i < bots.length; i++) {
@@ -39,19 +38,7 @@ public class Archon {
                     }
                     //move
                     dirToMove = rc.getLocation().directionTo(friendlyArchons[0]);
-                    if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
-                        // Too much rubble, so I should clear it
-                        if(rc.canMove(dirToMove.rotateLeft())){
-                            rc.move(dirToMove.rotateLeft());
-                        }
-                        else if(rc.canMove(dirToMove.rotateRight())){
-                            rc.move(dirToMove.rotateRight());
-                        }
-                        else {
-                            rc.clearRubble(dirToMove);
-                        }
-                        // Check if I can move in this direction
-                    } else if (rc.canMove(dirToMove)) {
+                    if (rc.canMove(dirToMove)) {
                         // Move
                         rc.move(dirToMove);
                     }else if(rc.canMove(dirToMove.rotateLeft())){
@@ -59,6 +46,10 @@ public class Archon {
                     }
                     else if(rc.canMove(dirToMove.rotateRight())){
                         rc.move(dirToMove.rotateRight());
+                    }
+                    else if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                        rc.clearRubble(dirToMove);
+                        // Check if I can move in this direction
                     }
                 }
                 //build
