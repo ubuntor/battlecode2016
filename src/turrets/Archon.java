@@ -57,11 +57,11 @@ public class Archon {
                 int built = 0;
                 Direction dirToBuild = nextDir;
                 if(mode == 0) {
-                    if (rc.getTeamParts() >= 125) {
+                    if (rc.getTeamParts() >= RobotType.TURRET.partCost) {
                         RobotType typeToBuild = RobotType.TURRET;
-                        if(count%4 == 0){
+                        /*if(count%4 == 0){
                             typeToBuild = RobotType.SCOUT;
-                        }
+                        }*/
                         for (int i = 0; i < 8; i++) {
                             // If possible, build in this direction
                             if (rc.canBuild(dirToBuild, typeToBuild)) {
