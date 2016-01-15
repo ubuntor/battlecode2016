@@ -22,6 +22,13 @@ public class Soldier {
         Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST,
                 Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
         try {
+            distance = 999;
+            for(int i = 0; i < targets.length; i++){
+                if(targets[i].distanceSquaredTo(rc.getLocation()) < distance){
+                    targetNum = i;
+                    distance = targets[i].distanceSquaredTo(rc.getLocation());
+                }
+            }
             // init stuff
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -90,6 +97,7 @@ public class Soldier {
                     //move to target
                     if(rc.getLocation().equals(targets[targetNum])){
                         targetNum++;
+                        targetNum = targetNum % targets.length;
                     }
                     else if(targetNum < targets.length) {
                         dirToMove = rc.getLocation().directionTo(targets[targetNum]);
