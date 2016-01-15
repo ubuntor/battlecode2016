@@ -14,7 +14,17 @@ public class Archon {
         Direction dirToMove;
         Direction dirToBuild;
         Random rand = new Random(rc.getID());
+        MapLocation[] targets = rc.getInitialArchonLocations(rc.getTeam().opponent());
+        int targetNum = 0;
+        int distance;
         try {
+            distance = 999;
+            for(int i = 0; i < targets.length; i++){
+                if(targets[i].distanceSquaredTo(rc.getLocation()) < distance){
+                    targetNum = i;
+                    distance = targets[i].distanceSquaredTo(rc.getLocation());
+                }
+            }
             // Any code here gets executed exactly once at the beginning of the game.
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -61,8 +71,18 @@ public class Archon {
                         else{
                             //build
                             if(rc.isCoreReady()) {
-                                if (rc.getTeamParts() >= RobotType.SOLDIER.partCost) {
-                                    dirToBuild = directions[rand.nextInt(8)];
+                                dirToBuild = rc.getLocation().directionTo(targets[targetNum]);
+                                if ((rc.getRoundNum() == 0 || rand.nextInt(100) >= 95) && rc.getTeamParts() >= RobotType.GUARD.partCost){
+                                    for (int i = 0; i < 8; i++) {
+                                        if (rc.canBuild(dirToBuild, RobotType.GUARD)) {
+                                            rc.build(dirToBuild, RobotType.GUARD);
+                                            break;
+                                        } else {
+                                            dirToBuild.rotateRight();
+                                        }
+                                    }
+                                }
+                                else if (rc.getTeamParts() >= RobotType.SOLDIER.partCost) {
                                     for (int i = 0; i < 8; i++) {
                                         if (rc.canBuild(dirToBuild, RobotType.SOLDIER)) {
                                             rc.build(dirToBuild, RobotType.SOLDIER);

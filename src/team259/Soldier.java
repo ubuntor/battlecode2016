@@ -22,6 +22,13 @@ public class Soldier {
         Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST,
                 Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
         try {
+            distance = 999;
+            for(int i = 0; i < targets.length; i++){
+                if(targets[i].distanceSquaredTo(rc.getLocation()) < distance){
+                    targetNum = i;
+                    distance = targets[i].distanceSquaredTo(rc.getLocation());
+                }
+            }
             // init stuff
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -52,36 +59,33 @@ public class Soldier {
                             if (rc.canMove(dirToMove)) {
                                 // Move away
                                 rc.move(dirToMove);
-                            } else {
-                                if (rc.canMove(dirToMove.rotateLeft()))
-                                    rc.move(dirToMove.rotateLeft());
-                                else if (rc.canMove(dirToMove.rotateRight()))
-                                    rc.move(dirToMove.rotateRight());
-                                else if (rc.canMove(dirToMove.rotateLeft().rotateLeft()))
-                                    rc.move(dirToMove.rotateLeft().rotateLeft());
-                                else if (rc.canMove(dirToMove.rotateRight().rotateRight()))
-                                    rc.move(dirToMove.rotateRight().rotateRight());
-                                // if we still can't move then we're fucked lol
+                            } else if (rc.canMove(dirToMove.rotateLeft())) {
+                                rc.move(dirToMove.rotateLeft());
+                            } else if (rc.canMove(dirToMove.rotateRight())) {
+                                rc.move(dirToMove.rotateRight());
+                            } else if (rc.canMove(dirToMove.rotateLeft().rotateLeft())) {
+                                rc.move(dirToMove.rotateLeft().rotateLeft());
+                            } else if (rc.canMove(dirToMove.rotateRight().rotateRight())) {
+                                rc.move(dirToMove.rotateRight().rotateRight());
                             }
+                                // if we still can't move then we're fucked lol
                         }
                         //run to
                         else if (!closestEnemy.equals(null) && distance > rc.getType().attackRadiusSquared) {
                             dirToMove = rc.getLocation().directionTo(closestEnemy.location);
-                            if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
-                                // Too much rubble, so I should clear it
-                                if(rc.canMove(dirToMove.rotateLeft())){
-                                    rc.move(dirToMove.rotateLeft());
-                                }
-                                else if(rc.canMove(dirToMove.rotateRight())){
-                                    rc.move(dirToMove.rotateRight());
-                                }
-                                else {
-                                    rc.clearRubble(dirToMove);
-                                }
-                                // Check if I can move in this direction
-                            } else if (rc.canMove(dirToMove)) {
+                            if (rc.canMove(dirToMove)) {
                                 // Move
                                 rc.move(dirToMove);
+                            }else if(rc.canMove(dirToMove.rotateLeft())){
+                                rc.move(dirToMove.rotateLeft());
+                            }
+                            else if(rc.canMove(dirToMove.rotateRight())){
+                                rc.move(dirToMove.rotateRight());
+                            }
+                            else if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                                // Too much rubble, so I should clear it
+                                rc.clearRubble(dirToMove);
+                                // Check if I can move in this direction
                             }
                         }
                     }
@@ -94,21 +98,19 @@ public class Soldier {
                     else if(targetNum < targets.length) {
                         dirToMove = rc.getLocation().directionTo(targets[targetNum]);
                     }
-                    if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
-                        // Too much rubble, so I should clear it
-                        if(rc.canMove(dirToMove.rotateLeft())){
-                            rc.move(dirToMove.rotateLeft());
-                        }
-                        else if(rc.canMove(dirToMove.rotateRight())){
-                            rc.move(dirToMove.rotateRight());
-                        }
-                        else {
-                            rc.clearRubble(dirToMove);
-                        }
-                        // Check if I can move in this direction
-                    } else if (rc.canMove(dirToMove)) {
+                    if (rc.canMove(dirToMove)) {
                         // Move
                         rc.move(dirToMove);
+                    }else if(rc.canMove(dirToMove.rotateLeft())){
+                        rc.move(dirToMove.rotateLeft());
+                    }
+                    else if(rc.canMove(dirToMove.rotateRight())){
+                        rc.move(dirToMove.rotateRight());
+                    }
+                    else if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                        // Too much rubble, so I should clear it
+                        rc.clearRubble(dirToMove);
+                        // Check if I can move in this direction
                     }
                 }
                 Clock.yield();

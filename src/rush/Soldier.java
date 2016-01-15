@@ -59,34 +59,21 @@ public class Soldier {
                             if (rc.canMove(dirToMove)) {
                                 // Move away
                                 rc.move(dirToMove);
-                            } else {
-                                if (rc.canMove(dirToMove.rotateLeft()))
-                                    rc.move(dirToMove.rotateLeft());
-                                else if (rc.canMove(dirToMove.rotateRight()))
-                                    rc.move(dirToMove.rotateRight());
-                                else if (rc.canMove(dirToMove.rotateLeft().rotateLeft()))
-                                    rc.move(dirToMove.rotateLeft().rotateLeft());
-                                else if (rc.canMove(dirToMove.rotateRight().rotateRight()))
-                                    rc.move(dirToMove.rotateRight().rotateRight());
-                                // if we still can't move then we're fucked lol
+                            } else if (rc.canMove(dirToMove.rotateLeft())) {
+                                rc.move(dirToMove.rotateLeft());
+                            } else if (rc.canMove(dirToMove.rotateRight())) {
+                                rc.move(dirToMove.rotateRight());
+                            } else if (rc.canMove(dirToMove.rotateLeft().rotateLeft())) {
+                                rc.move(dirToMove.rotateLeft().rotateLeft());
+                            } else if (rc.canMove(dirToMove.rotateRight().rotateRight())) {
+                                rc.move(dirToMove.rotateRight().rotateRight());
                             }
+                            // if we still can't move then we're fucked lol
                         }
                         //run to
                         else if (!closestEnemy.equals(null) && distance > rc.getType().attackRadiusSquared) {
                             dirToMove = rc.getLocation().directionTo(closestEnemy.location);
-                            if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
-                                // Too much rubble, so I should clear it
-                                if(rc.canMove(dirToMove.rotateLeft())){
-                                    rc.move(dirToMove.rotateLeft());
-                                }
-                                else if(rc.canMove(dirToMove.rotateRight())){
-                                    rc.move(dirToMove.rotateRight());
-                                }
-                                else {
-                                    rc.clearRubble(dirToMove);
-                                }
-                                // Check if I can move in this direction
-                            } else if (rc.canMove(dirToMove)) {
+                            if (rc.canMove(dirToMove)) {
                                 // Move
                                 rc.move(dirToMove);
                             }else if(rc.canMove(dirToMove.rotateLeft())){
@@ -95,6 +82,11 @@ public class Soldier {
                             else if(rc.canMove(dirToMove.rotateRight())){
                                 rc.move(dirToMove.rotateRight());
                             }
+                            else if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                                // Too much rubble, so I should clear it
+                                rc.clearRubble(dirToMove);
+                                // Check if I can move in this direction
+                            }
                         }
                     }
                     //patrol/move
@@ -102,24 +94,11 @@ public class Soldier {
                     //move to target
                     if(rc.getLocation().equals(targets[targetNum])){
                         targetNum++;
-                        targetNum = targetNum % targets.length;
                     }
                     else if(targetNum < targets.length) {
                         dirToMove = rc.getLocation().directionTo(targets[targetNum]);
                     }
-                    if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
-                        // Too much rubble, so I should clear it
-                        if(rc.canMove(dirToMove.rotateLeft())){
-                            rc.move(dirToMove.rotateLeft());
-                        }
-                        else if(rc.canMove(dirToMove.rotateRight())){
-                            rc.move(dirToMove.rotateRight());
-                        }
-                        else {
-                            rc.clearRubble(dirToMove);
-                        }
-                        // Check if I can move in this direction
-                    } else if (rc.canMove(dirToMove)) {
+                    if (rc.canMove(dirToMove)) {
                         // Move
                         rc.move(dirToMove);
                     }else if(rc.canMove(dirToMove.rotateLeft())){
@@ -127,6 +106,11 @@ public class Soldier {
                     }
                     else if(rc.canMove(dirToMove.rotateRight())){
                         rc.move(dirToMove.rotateRight());
+                    }
+                    else if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                        // Too much rubble, so I should clear it
+                        rc.clearRubble(dirToMove);
+                        // Check if I can move in this direction
                     }
                 }
                 Clock.yield();
