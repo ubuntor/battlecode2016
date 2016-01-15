@@ -89,6 +89,11 @@ public class Soldier {
                             } else if (rc.canMove(dirToMove)) {
                                 // Move
                                 rc.move(dirToMove);
+                            }else if(rc.canMove(dirToMove.rotateLeft())){
+                                rc.move(dirToMove.rotateLeft());
+                            }
+                            else if(rc.canMove(dirToMove.rotateRight())){
+                                rc.move(dirToMove.rotateRight());
                             }
                         }
                     }
@@ -117,6 +122,11 @@ public class Soldier {
                     } else if (rc.canMove(dirToMove)) {
                         // Move
                         rc.move(dirToMove);
+                    }else if(rc.canMove(dirToMove.rotateLeft())){
+                        rc.move(dirToMove.rotateLeft());
+                    }
+                    else if(rc.canMove(dirToMove.rotateRight())){
+                        rc.move(dirToMove.rotateRight());
                     }
                 }
                 Clock.yield();
