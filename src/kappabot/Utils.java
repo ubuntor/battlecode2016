@@ -7,7 +7,8 @@ import battlecode.common.*;
 public class Utils {
 	public static RobotController rc = RobotPlayer.rc;
 	public static LinkedList<MapLocation> locHis = new LinkedList<MapLocation>();
-	public static int[] dirTry = {0,7,1,6,2,5,3,4};
+//	public static int[] dirTry = {0,7,1,6,2,5,3,4};
+	public static int[] dirTry = {0,7,1,6,2};
 	
 	public static void moveTowards(MapLocation p) throws GameActionException {
 		if (rc.isCoreReady()) {
@@ -16,10 +17,13 @@ public class Utils {
 				Direction attempt = Direction.values()[(d.ordinal()+i)%8];
 				if (!locHis.contains(rc.getLocation().add(attempt)) && rc.canMove(attempt)) {
 					locHis.add(rc.getLocation());
-					if (locHis.size() > 10) locHis.removeFirst();
+					if (locHis.size() > 5) locHis.removeFirst();
 					rc.move(attempt);
 					return;
 				}
+			}
+			if (rc.senseRubble(rc.getLocation().add(d)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+				rc.clearRubble(d);
 			}
 		}
 	}
