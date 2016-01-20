@@ -23,8 +23,8 @@ public class Guard {
                 Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
         try {
             distance = 999;
-            for(int i = 0; i < targets.length; i++){
-                if(targets[i].distanceSquaredTo(rc.getLocation()) < distance){
+            for (int i = 0; i < targets.length; i++) {
+                if (targets[i].distanceSquaredTo(rc.getLocation()) < distance) {
                     targetNum = i;
                     distance = targets[i].distanceSquaredTo(rc.getLocation());
                 }
@@ -41,8 +41,7 @@ public class Guard {
                 if (attackable.length > 0 && rc.isWeaponReady()) {
                     toAttack = findWeakest(attackable);
                     rc.attackLocation(toAttack);
-                }
-                else {
+                } else {
                     //micro
                     enemies = rc.senseHostileRobots(rc.getLocation(), 24);
                     if (enemies.length > 0) {
@@ -54,47 +53,44 @@ public class Guard {
                             }
                         }
                         //run to
-                        if (!closestEnemy.equals(null) && distance > rc.getType().attackRadiusSquared) {
+                        if (rc.isCoreReady() && !closestEnemy.equals(null) && distance > rc.getType().attackRadiusSquared) {
                             dirToMove = rc.getLocation().directionTo(closestEnemy.location);
                             if (rc.canMove(dirToMove)) {
                                 // Move
                                 rc.move(dirToMove);
-                            }else if(rc.canMove(dirToMove.rotateLeft())){
+                            } else if (rc.canMove(dirToMove.rotateLeft())) {
                                 rc.move(dirToMove.rotateLeft());
-                            }
-                            else if(rc.canMove(dirToMove.rotateRight())){
+                            } else if (rc.canMove(dirToMove.rotateRight())) {
                                 rc.move(dirToMove.rotateRight());
-                            }
-                            else if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                            } else if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
                                 // Too much rubble, so I should clear it
                                 rc.clearRubble(dirToMove);
                                 // Check if I can move in this direction
                             }
                         }
                     }
-                    //patrol/move
-                    dirToMove = directions[rand.nextInt(8)];
-                    //move to target
-                    if(rc.getLocation().equals(targets[targetNum])){
-                        targetNum++;
-                        targetNum = targetNum % targets.length;
-                    }
-                    else if(targetNum < targets.length) {
-                        dirToMove = rc.getLocation().directionTo(targets[targetNum]);
-                    }
-                    if (rc.canMove(dirToMove)) {
-                        // Move
-                        rc.move(dirToMove);
-                    }else if(rc.canMove(dirToMove.rotateLeft())){
-                        rc.move(dirToMove.rotateLeft());
-                    }
-                    else if(rc.canMove(dirToMove.rotateRight())){
-                        rc.move(dirToMove.rotateRight());
-                    }
-                    else if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
-                        // Too much rubble, so I should clear it
-                        rc.clearRubble(dirToMove);
-                        // Check if I can move in this direction
+                    if (rc.isCoreReady()) {
+                        //patrol/move
+                        dirToMove = directions[rand.nextInt(8)];
+                        //move to target
+                        if (rc.getLocation().equals(targets[targetNum])) {
+                            targetNum++;
+                            targetNum = targetNum % targets.length;
+                        } else if (targetNum < targets.length) {
+                            dirToMove = rc.getLocation().directionTo(targets[targetNum]);
+                        }
+                        if (rc.canMove(dirToMove)) {
+                            // Move
+                            rc.move(dirToMove);
+                        } else if (rc.canMove(dirToMove.rotateLeft())) {
+                            rc.move(dirToMove.rotateLeft());
+                        } else if (rc.canMove(dirToMove.rotateRight())) {
+                            rc.move(dirToMove.rotateRight());
+                        } else if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                            // Too much rubble, so I should clear it
+                            rc.clearRubble(dirToMove);
+                            // Check if I can move in this direction
+                        }
                     }
                 }
                 Clock.yield();
@@ -105,14 +101,14 @@ public class Guard {
         }
     }
 
-    private static MapLocation findWeakest(RobotInfo[] listOfRobots){
+    private static MapLocation findWeakest(RobotInfo[] listOfRobots) {
         double weakestSoFar = -100;
         MapLocation weakestLocation = null;
-        for(RobotInfo r:listOfRobots){
-            double weakness = r.maxHealth-r.health;
-            if(weakness>weakestSoFar){
+        for (RobotInfo r : listOfRobots) {
+            double weakness = r.maxHealth - r.health;
+            if (weakness > weakestSoFar) {
                 weakestLocation = r.location;
-                weakestSoFar=weakness;
+                weakestSoFar = weakness;
             }
         }
         return weakestLocation;
