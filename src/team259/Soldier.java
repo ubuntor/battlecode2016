@@ -2,150 +2,177 @@ package team259;
 
 import battlecode.common.*;
 
+import java.util.Arrays;
 import java.util.Random;
-import java.lang.Math;
 
 /**
- * Created by samuel on 1/11/16.
+ * Created by allen on 1/19/16.
  */
 public class Soldier {
     public static void run(RobotController rc) {
         Random rand = new Random(rc.getID());
         int fate = rand.nextInt(1000);
-        Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST,
-                Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
-        int mode = 0; //chill
-        int destx = 0;
-        int desty = 0;
+        MapLocation[] patrol = new MapLocation[4];
+        int nextDest = 0;
+        Team myTeam = null;
+        Team otherTeam = null;
         try {
-            destx = rc.getLocation().x;
-            desty = rc.getLocation().y;
-            // init stuff
+        	myTeam = rc.getTeam();
+			otherTeam = myTeam.opponent();
+        	MapLocation tlArchon = null;
+        	int numArchons = rc.getInitialArchonLocations(myTeam).length;
+//            for(RobotInfo r : rc.senseNearbyRobots(24, myTeam)){
+//            	if(r.type.equals(RobotType.ARCHON)){
+//            		if(tlArchon == null)
+//            			tlArchon = r.location;
+//            		else {
+//            			Direction tempDir = r.location.directionTo(tlArchon);
+//            			if(tempDir.equals(Direction.EAST) || tempDir.equals(Direction.SOUTH_EAST) || tempDir.equals(Direction.SOUTH))
+//            				tlArchon = r.location;
+//            		}
+//            	}
+//            }
+            Signal[] sigs = rc.emptySignalQueue();
+            for(Signal s : sigs){
+            	if(s.getTeam().equals(myTeam)){
+            		int[] message = s.getMessage();
+            		if(message != null && message[0] == Utils.SOLDIER_PATROL){
+            			int[] temp = Utils.unpack2(message[1]);
+            			tlArchon = new MapLocation(temp[0], temp[1]);
+            		}
+            	}
+            		
+            }
+            if(tlArchon == null){
+            	tlArchon = rc.getLocation();
+//            	System.out.println("!!");
+            }
+
+            patrol[0] = tlArchon.add(Direction.NORTH_WEST, 2);
+            patrol[1] = tlArchon.add(Direction.NORTH_EAST, 2);
+            patrol[2] = tlArchon.add(Direction.SOUTH_EAST, 2);
+            patrol[3] = tlArchon.add(Direction.SOUTH_WEST, 2);
+            if(numArchons > 1){
+            	patrol[1] = patrol[1].add(Direction.EAST);
+            	patrol[2] = patrol[2].add(Direction.EAST);
+            }
+            if(numArchons > 2){
+            	patrol[2] = patrol[2].add(Direction.SOUTH);
+            	patrol[3] = patrol[3].add(Direction.SOUTH);
+            }
+//            System.out.println(Arrays.toString(patrol));
+            MapLocation currLoc = rc.getLocation();
+            if(currLoc.x - patrol[0].x <= 1){
+            	nextDest = 0;
+            } else if(currLoc.y - patrol[1].y <= 1){
+            	nextDest = 1;
+            } else if(patrol[2].x - currLoc.x <= 1){
+            	nextDest = 2;
+            } else if(patrol[3].y - currLoc.y <= 1){
+            	nextDest = 3;
+            } else {
+            	for(int i = 1; i < patrol.length; i++){
+            		if(currLoc.distanceSquaredTo(patrol[i]) < currLoc.distanceSquaredTo(patrol[nextDest]))
+            			nextDest = i;
+            	}
+            }
+            
         } catch (Exception e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
         }
         while (true) {
             try {
-                int heuristic = -1;
-                int val = 0;
-                MapLocation maxloc = rc.getLocation();
-                RobotInfo[] attackable = rc.senseHostileRobots(rc.getLocation(), 13);
-                for(int i = 0; i < attackable.length; i++){
-                    val = 0;
-                    if(attackable[i].type == RobotType.GUARD || attackable[i].type == RobotType.ARCHON){
-                        val = 4;
-                    } else if(attackable[i].type == RobotType.TTM){
-                        val = 5;
-                    } else if(attackable[i].type == RobotType.SOLDIER){
-                        val = 6;
-                    } else if(attackable[i].type == RobotType.TURRET){
-                        val = 7;
-                    } else if(attackable[i].type == RobotType.VIPER){
-                        val = 8;
-                    } if (attackable[i].health <= 8) {
-                        val *= 2;
-                    }
-                    if(attackable[i].type == RobotType.FASTZOMBIE || attackable[i].type == RobotType.BIGZOMBIE){
-                        val = 1;
-                    } else if(attackable[i].type == RobotType.STANDARDZOMBIE) {
-                        val = 2;
-                    } else if(attackable[i].type == RobotType.RANGEDZOMBIE){
-                        val = 3;
-                    }
-                    if( val > heuristic){
-                        maxloc = attackable[i].location;
-                        heuristic = val;
-                    }
+            	MapLocation currLoc = rc.getLocation();
+            	Signal[] sigs = rc.emptySignalQueue();
+                MapLocation attackLoc = null;;
+                for(Signal s : sigs){
+                   if(s.getTeam() == rc.getTeam()){
+                      int[] msg = s.getMessage();
+                      if(msg != null && msg[0] == Utils.SOLDIER_ATTACK){
+                         int[] loc = Utils.unpack2(msg[1]);
+                    	 attackLoc = new MapLocation(loc[0], loc[1]); 
+                         break;
+                      }
+                   }
                 }
-                if(rc.isWeaponReady() && !maxloc.equals(rc.getLocation())){
-                    rc.attackLocation(maxloc);
-                }
-                heuristic = -1;
-                maxloc = rc.getLocation();
-                RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), 24);
-                for(int i = 0; i < enemies.length; i++){
-                    val = 0;
-                    if(enemies[i].type == RobotType.GUARD || enemies[i].type == RobotType.ARCHON){
-                        val = 4;
-                    } else if(enemies[i].type == RobotType.TTM){
-                        val = 5;
-                    } else if(enemies[i].type == RobotType.SOLDIER){
-                        val = 6;
-                    } else if(enemies[i].type == RobotType.TURRET){
-                        val = 7;
-                    } else if(enemies[i].type == RobotType.VIPER){
-                        val = 8;
-                    } if (enemies[i].health <= 16) {
-                        val *= 2;
-                    }
-                    if(enemies[i].type == RobotType.FASTZOMBIE || enemies[i].type == RobotType.BIGZOMBIE){
-                        val = 1;
-                    } else if(enemies[i].type == RobotType.STANDARDZOMBIE) {
-                        val = 2;
-                    } else if(enemies[i].type == RobotType.RANGEDZOMBIE){
-                        val = 3;
-                    }
-                    if( val > heuristic){
-                        maxloc = enemies[i].location;
-                        heuristic = val;
-                    }
+                if(rc.isWeaponReady()){
+                	if(attackLoc != null && rc.canAttackLocation(attackLoc))
+                		rc.attackLocation(attackLoc);
+                	else {
+                		RobotInfo[] hostile = rc.senseHostileRobots(currLoc, 24);
+                		RobotInfo bestTarget = null;
+    					double maxExpected = 0;
+    					for(int i = 0; i < hostile.length; i++){
+    						if(!rc.canAttackLocation(hostile[i].location))
+    							continue;
+    						int dist = currLoc.distanceSquaredTo(hostile[i].location);
+    						double tempExpected = 0;
+    						if (hostile[i].type.equals(RobotType.SOLDIER) && dist <= 13){
+    							tempExpected += 2 / hostile[i].health;
+    						} else if (hostile[i].type.equals(RobotType.GUARD) && dist <= 2){
+    							tempExpected += 1.5 / hostile[i].health;
+    						} else if (hostile[i].type.equals(RobotType.VIPER) && dist <= 20){
+    							tempExpected += (8.0/3) / hostile[i].health;
+    						} else if (hostile[i].type.equals(RobotType.TURRET) && dist <= 48){
+    							tempExpected += (13.0/3) / hostile[i].health;
+    						} else if (hostile[i].type.equals(RobotType.RANGEDZOMBIE) && dist <= 13){
+    							tempExpected += 3 / hostile[i].health;
+    						} else if (hostile[i].type.equals(RobotType.STANDARDZOMBIE) && dist <= 2){
+    							tempExpected += 1.25 / hostile[i].health;
+    						} else if (hostile[i].type.equals(RobotType.FASTZOMBIE) && dist <= 2){
+    							tempExpected += 3 / hostile[i].health;
+    						} else if (hostile[i].type.equals(RobotType.BIGZOMBIE) && dist <= 2){
+    							tempExpected += (25.0/3) / hostile[i].health;
+    						}
+    						if(tempExpected > maxExpected || bestTarget == null ||
+    								(tempExpected == maxExpected && dist > bestTarget.location.distanceSquaredTo(currLoc))){
+    							maxExpected = tempExpected;
+    							bestTarget = hostile[i];
+    						}
+    					}
+    					if(bestTarget != null)
+    						rc.attackLocation(bestTarget.location);
+                	}
                 }
                 if(rc.isCoreReady()){
-                    Direction dirToMove = rc.getLocation().directionTo(maxloc);
-                    if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
-                        // Too much rubble, so I should clear it
-                        rc.clearRubble(dirToMove);
-                        // Check if I can move in this direction
-                    } else if (rc.canMove(dirToMove)) {
-                        // Move
-                        rc.move(dirToMove);
-                    }
+//                	System.out.println(rc.getID());
+                	Direction moveDir = currLoc.directionTo(patrol[nextDest]);
+//                	System.out.println(moveDir);
+					if (rc.senseRubble(currLoc.add(moveDir)) > 0){
+						rc.clearRubble(moveDir);
+//						System.out.println("" + rc.getID() + ": clearing rubble");
+					} else if(!rc.canMove(moveDir)){
+						RobotInfo inWay = rc.senseRobotAtLocation(currLoc.add(moveDir));
+                		if(inWay == null){
+                			if(rc.senseRubble(currLoc.add(moveDir)) > 0)
+                				rc.clearRubble(moveDir);
+//                			System.out.println("" + rc.getID() + ":  nutin in way, going for " + patrol[nextDest]);
+                		} else if(rc.isCoreReady() && (!inWay.team.equals(myTeam) || !inWay.type.equals(RobotType.SOLDIER))){
+                			if(rc.canMove(moveDir.rotateLeft()))
+                				rc.move(moveDir.rotateLeft());
+                			else if(rc.canMove(moveDir.rotateRight()))
+                				rc.move(moveDir.rotateRight());
+                			else if(rc.canMove(moveDir.rotateLeft().rotateLeft()))
+                				rc.move(moveDir.rotateLeft().rotateLeft());
+                			else if(rc.canMove(moveDir.rotateRight().rotateRight()))
+                				rc.move(moveDir.rotateRight().rotateRight());
+                		}
+                	} else if(rc.isCoreReady())
+                		rc.move(moveDir);
                 }
-
-                Signal msg = null;
-                Signal[] inbox = rc.emptySignalQueue();
-                for(int i = 0; i <inbox.length; i++){
-                    if(inbox[i].getTeam() == rc.getTeam()){
-                        if(inbox[i].getMessage()[0] == 9 && inbox[i].getMessage()[1] == 9){
-                            msg = inbox[i+1];
-                            break;
-                        }
-                    }
+                if(rc.getLocation().equals(patrol[nextDest])){
+//                	System.out.println(myTeam);
+                	nextDest = (nextDest + 1) % patrol.length;
                 }
-                if(msg != null){
-                    destx = msg.getMessage()[0];
-                    desty = msg.getMessage()[1];
-                    mode = 2;
-                }
-                if(mode == 2) {
-                    MapLocation loc = new MapLocation(destx, desty);
-                    if (!loc.equals(rc.getLocation())) {
-                        if (rc.isCoreReady()) {
-                            if (rc.senseRubble(rc.getLocation().add(rc.getLocation().directionTo(loc))) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
-                                // Too much rubble, so I should clear it
-                                rc.clearRubble(rc.getLocation().directionTo(loc));
-                                // Check if I can move in this direction
-                            }
-                            // Check the rubble in that direction
-                            if (rc.canMove(rc.getLocation().directionTo(loc))) {
-                                // Move
-                                rc.move(rc.getLocation().directionTo(loc));
-                            }
-                        }
-                    }
-                }
-                //patrol
-                Direction dirToMove = directions[fate % 8];
-                // Check the rubble in that direction
-                if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
-                    // Too much rubble, so I should clear it
-                    rc.clearRubble(dirToMove);
-                    // Check if I can move in this direction
-                } else if (rc.canMove(dirToMove)) {
-                    // Move
-                    rc.move(dirToMove);
-                }
+                if(currLoc.x < patrol[0].x)
+                	nextDest = 0;
+                else if(currLoc.y < patrol[1].y)
+                	nextDest = 1;
+                else if(currLoc.x > patrol[2].x)
+                	nextDest = 2;
+                else if(currLoc.y > patrol[3].y)
+                	nextDest = 3;
 
                 Clock.yield();
             } catch (Exception e) {
