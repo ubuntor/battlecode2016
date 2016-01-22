@@ -12,11 +12,13 @@ public class Guard {
     public static void run(RobotController rc) {
         Random rand = new Random(rc.getID());
         int distance;
+        int cycle = 0;
         Direction dirToMove;
         RobotInfo closestEnemy = null;
         RobotInfo[] attackable;
         RobotInfo[] enemies;
         MapLocation toAttack;
+        MapLocation originalTarget = rc.getLocation();
         MapLocation[] targets = rc.getInitialArchonLocations(rc.getTeam().opponent());
         int targetNum = 0;
         Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST,
@@ -29,6 +31,7 @@ public class Guard {
                     distance = targets[i].distanceSquaredTo(rc.getLocation());
                 }
             }
+            originalTarget = targets[targetNum];
             // init stuff
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -37,23 +40,53 @@ public class Guard {
         while (true) {
             try {
                 //attack
-                attackable = rc.senseHostileRobots(rc.getLocation(), rc.getType().attackRadiusSquared);
-                if (attackable.length > 0 && rc.isWeaponReady()) {
-                    toAttack = findWeakest(attackable);
-                    rc.attackLocation(toAttack);
-                } else {
+                if(rc.isWeaponReady()){
+                    attackable = rc.senseHostileRobots(rc.getLocation(), rc.getType().attackRadiusSquared);
+                    if (attackable.length > 0) {
+                        toAttack = findWeakest(attackable);
+                        rc.attackLocation(toAttack);
+                    }
+                }
+
+                if(rc.isCoreReady()) {
                     //micro
-                    enemies = rc.senseHostileRobots(rc.getLocation(), 24);
+                    enemies = rc.senseHostileRobots(rc.getLocation(), rc.getType().sensorRadiusSquared);
                     if (enemies.length > 0) {
                         distance = 999;
-                        for (int i = 0; i < enemies.length; i++) {
-                            if (enemies[i].team.equals(rc.getTeam().opponent()) && enemies[i].location.distanceSquaredTo(rc.getLocation()) < distance) {
-                                closestEnemy = enemies[i];
-                                distance = enemies[i].location.distanceSquaredTo(rc.getLocation());
+                        for (RobotInfo r : enemies) {
+                            if (r.location.distanceSquaredTo(rc.getLocation()) < distance) {
+                                closestEnemy = r;
+                                distance = r.location.distanceSquaredTo(rc.getLocation());
                             }
                         }
+
+                        //run away
+                        if (rc.isCoreReady() && distance <= rc.getType().attackRadiusSquared) {
+                            dirToMove = closestEnemy.location.directionTo(rc.getLocation());
+                            if (rc.canMove(dirToMove)) {
+                                // Move away
+                                rc.move(dirToMove);
+                            } else if (rc.canMove(dirToMove.rotateLeft())) {
+                                rc.move(dirToMove.rotateLeft());
+                            } else if (rc.canMove(dirToMove.rotateRight())){
+                                rc.move(dirToMove.rotateRight());
+                            } else if (rc.canMove(dirToMove.rotateLeft().rotateLeft())){
+                                rc.move(dirToMove.rotateLeft().rotateLeft());
+                            } else if (rc.canMove(dirToMove.rotateRight().rotateRight())){
+                                rc.move(dirToMove.rotateRight().rotateRight());
+                            } else if (rc.canMove(dirToMove.rotateLeft().rotateLeft().rotateLeft())) {
+                                rc.move(dirToMove.rotateLeft().rotateLeft().rotateLeft());
+                            } else if (rc.canMove(dirToMove.rotateRight().rotateRight().rotateRight())) {
+                                rc.move(dirToMove.rotateRight().rotateRight().rotateRight());
+                            } else if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                                // Too much rubble, so I should clear it
+                                rc.clearRubble(dirToMove);
+                            }
+                            // if we still can't move then we're fucked lol
+                        }
+
                         //run to
-                        if (rc.isCoreReady() && !closestEnemy.equals(null) && distance > rc.getType().attackRadiusSquared) {
+                        if (rc.isCoreReady() && distance > rc.getType().attackRadiusSquared) {
                             dirToMove = rc.getLocation().directionTo(closestEnemy.location);
                             if (rc.canMove(dirToMove)) {
                                 // Move
@@ -62,6 +95,10 @@ public class Guard {
                                 rc.move(dirToMove.rotateLeft());
                             } else if (rc.canMove(dirToMove.rotateRight())) {
                                 rc.move(dirToMove.rotateRight());
+                            } else if (rc.canMove(dirToMove.rotateLeft().rotateLeft())){
+                                rc.move(dirToMove.rotateLeft().rotateLeft());
+                            } else if (rc.canMove(dirToMove.rotateRight().rotateRight())){
+                                rc.move(dirToMove.rotateRight().rotateRight());
                             } else if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
                                 // Too much rubble, so I should clear it
                                 rc.clearRubble(dirToMove);
@@ -69,15 +106,21 @@ public class Guard {
                             }
                         }
                     }
+
+                    //patrol/move
                     if (rc.isCoreReady()) {
-                        //patrol/move
                         dirToMove = directions[rand.nextInt(8)];
                         //move to target
-                        if (rc.getLocation().equals(targets[targetNum])) {
-                            targetNum++;
-                            targetNum = targetNum % targets.length;
-                        } else if (targetNum < targets.length) {
-                            dirToMove = rc.getLocation().directionTo(targets[targetNum]);
+                        if(cycle == 0) {
+                            if (rc.getLocation().distanceSquaredTo(targets[targetNum]) <= 2) {
+                                targetNum++;
+                                targetNum = targetNum % targets.length;
+                                if (originalTarget == targets[targetNum]) {
+                                    cycle = 1;
+                                }
+                            } else if (targetNum < targets.length) {
+                                dirToMove = rc.getLocation().directionTo(targets[targetNum]);
+                            }
                         }
                         if (rc.canMove(dirToMove)) {
                             // Move
@@ -106,6 +149,21 @@ public class Guard {
         MapLocation weakestLocation = null;
         for (RobotInfo r : listOfRobots) {
             double weakness = r.maxHealth - r.health;
+            if (r.type == RobotType.TURRET){
+                weakness *= 6;
+            }
+            else if (r.type == RobotType.VIPER){
+                weakness *= 5;
+            }
+            else if (r.type == RobotType.SOLDIER){
+                weakness *= 4;
+            }
+            else if (r.type == RobotType.GUARD){
+                weakness *= 3;
+            }
+            else if (r.type == RobotType.ARCHON || r.type ==  RobotType.SCOUT){
+                weakness *= 2;
+            }
             if (weakness > weakestSoFar) {
                 weakestLocation = r.location;
                 weakestSoFar = weakness;

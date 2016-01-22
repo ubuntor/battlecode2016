@@ -1,4 +1,4 @@
-package team259;
+package turtle;
 
 import battlecode.common.*;
 
@@ -71,8 +71,6 @@ public class Archon {
         	for(int i = 0; i < enemies.length; i++){
         		enemyArchons.put(-i - 1, enemies[i]);
         	}
-        	
-        	
 //            Direction dirToBuild = Direction.NORTH;
 //            for (int i = 0; archonID < 2 && i < 8; i++) {
 //                // If possible, build in this direction
@@ -119,7 +117,8 @@ public class Archon {
                 RobotInfo[] zombies = rc.senseNearbyRobots(35, Team.ZOMBIE);
                 RobotInfo[] allies = rc.senseNearbyRobots(35, myTeam);
                 MapLocation currLoc = rc.getLocation();
-                
+
+				//neutrals
                 RobotInfo[] neutrals = rc.senseNearbyRobots(2, Team.NEUTRAL);
         		RobotInfo bestToActivate = null;
         		int prio = -1;
@@ -147,7 +146,8 @@ public class Archon {
             	}
             	if(bestToActivate != null && rc.isCoreReady())
             		rc.activate(bestToActivate.location);
-                
+
+				//healing
                 int mostHurt = -1;
                 int nearArchons = 0;
                 int soldierCount = 0;

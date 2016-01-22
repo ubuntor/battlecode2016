@@ -1,4 +1,4 @@
-package team259;
+package turtle;
 
 import battlecode.common.*;
 
@@ -75,7 +75,7 @@ public class Guard {
                     //patrol/move
                     dirToMove = directions[rand.nextInt(8)];
                     //move to target
-                    if(rc.getLocation().equals(targets[targetNum])){
+                    if (rc.getLocation().distanceSquaredTo(targets[targetNum]) <= 2){
                         targetNum++;
                         targetNum = targetNum % targets.length;
                     }
