@@ -1,4 +1,4 @@
-package rush;
+package team259;
 
 /**
  * Created by samuel on 1/11/16.
