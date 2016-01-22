@@ -8,7 +8,7 @@ import java.lang.Math;
 /**
  * Created by samuel on 1/11/16.
  */
-public class Soldier {
+public class Guard {
     public static void run(RobotController rc) {
         Random rand = new Random(rc.getID());
         int distance;
@@ -53,25 +53,8 @@ public class Soldier {
                                 distance = enemies[i].location.distanceSquaredTo(rc.getLocation());
                             }
                         }
-                        //run away
-                        if (!closestEnemy.equals(null) && distance <= rc.getType().attackRadiusSquared) {
-                            dirToMove = closestEnemy.location.directionTo(rc.getLocation());
-                            if (rc.canMove(dirToMove)) {
-                                // Move away
-                                rc.move(dirToMove);
-                            } else if (rc.canMove(dirToMove.rotateLeft())) {
-                                rc.move(dirToMove.rotateLeft());
-                            } else if (rc.canMove(dirToMove.rotateRight())) {
-                                rc.move(dirToMove.rotateRight());
-                            } else if (rc.canMove(dirToMove.rotateLeft().rotateLeft())) {
-                                rc.move(dirToMove.rotateLeft().rotateLeft());
-                            } else if (rc.canMove(dirToMove.rotateRight().rotateRight())) {
-                                rc.move(dirToMove.rotateRight().rotateRight());
-                            }
-                                // if we still can't move then we're fucked lol
-                        }
                         //run to
-                        else if (!closestEnemy.equals(null) && distance > rc.getType().attackRadiusSquared) {
+                        if (!closestEnemy.equals(null) && distance > rc.getType().attackRadiusSquared) {
                             dirToMove = rc.getLocation().directionTo(closestEnemy.location);
                             if (rc.canMove(dirToMove)) {
                                 // Move
@@ -94,6 +77,7 @@ public class Soldier {
                     //move to target
                     if(rc.getLocation().equals(targets[targetNum])){
                         targetNum++;
+                        targetNum = targetNum % targets.length;
                     }
                     else if(targetNum < targets.length) {
                         dirToMove = rc.getLocation().directionTo(targets[targetNum]);

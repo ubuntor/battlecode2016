@@ -11,7 +11,6 @@ import java.lang.Math;
 public class Guard {
     public static void run(RobotController rc) {
         Random rand = new Random(rc.getID());
-        int fate = rand.nextInt(1000);
         Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST,
                 Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
         int mode = 0; //chill
@@ -25,7 +24,7 @@ public class Guard {
         while (true) {
             try {
                 int heuristic = -1;
-                int val = 0;
+                int val;
                 MapLocation maxloc = rc.getLocation();
                 RobotInfo[] attackable = rc.senseHostileRobots(rc.getLocation(), 2);
                 for (int i = 0; i < attackable.length; i++) {
@@ -101,7 +100,6 @@ public class Guard {
                         rc.move(dirToMove);
                     }
                 }
-                Signal msg = null;
                 Signal[] inbox = rc.emptySignalQueue();
                 for (int i = 0; i < inbox.length; i++) {
                     if (inbox[i].getTeam() == rc.getTeam()) {
@@ -114,7 +112,7 @@ public class Guard {
                         }
                     }
                 }
-                if (mode == 2) {
+                if (mode == 2) { // attack mode?
                     MapLocation loc = new MapLocation(destx, desty);
                     if (!loc.equals(rc.getLocation())) {
                         if (rc.isCoreReady()) {
@@ -132,8 +130,7 @@ public class Guard {
                     }
                 }
                 //patrol
-
-                Direction dirToMove = directions[fate % 8];
+                Direction dirToMove = directions[rand.nextInt(8)];
                 // Check the rubble in that direction
                 if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
                     // Too much rubble, so I should clear it
