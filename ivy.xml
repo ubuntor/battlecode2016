@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 
-<!-- This is an "ivy file". Apache Ivy is a tool for "dependency management": 
+<!-- This is an "ivy file". Apache Ivy is a tool for "dependency management":
      finding and downloading all of the things you need to build and run a
      piece of software; in this case, battlecode. -->
 
