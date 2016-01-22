@@ -92,6 +92,24 @@ public class Archon {
                                         }
                                     }
                                 }
+                                else {
+                                    if (rc.getLocation().equals(targets[targetNum])) {
+                                        targetNum++;
+                                        targetNum = targetNum % targets.length;
+                                    }
+                                    if (rc.canMove(dirToBuild)) {
+                                        // Move
+                                        rc.move(dirToBuild);
+                                    } else if (rc.canMove(dirToBuild.rotateLeft())) {
+                                        rc.move(dirToBuild.rotateLeft());
+                                    } else if (rc.canMove(dirToBuild.rotateRight())) {
+                                        rc.move(dirToBuild.rotateRight());
+                                    } else if (rc.senseRubble(rc.getLocation().add(dirToBuild)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                                        // Too much rubble, so I should clear it
+                                        rc.clearRubble(dirToBuild);
+                                        // Check if I can move in this direction
+                                    }
+                                }
                             }
                         }
                     }
