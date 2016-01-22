@@ -1,4 +1,4 @@
-package turrets;
+package rush;
 
 /**
  * Created by samuel on 1/11/16.

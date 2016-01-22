@@ -1,4 +1,4 @@
-package deathball;
+package rush;
 
 import battlecode.common.*;
 

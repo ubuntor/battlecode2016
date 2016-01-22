@@ -1,4 +1,4 @@
-package turrets;
+package rush;
 
 import battlecode.common.*;
 
