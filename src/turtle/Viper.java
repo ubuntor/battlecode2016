@@ -1,4 +1,4 @@
-package team259;
+package turtle;
 
 import java.util.Random;
 
@@ -9,14 +9,14 @@ import battlecode.common.*;
  */
 public class Viper {
     public static void run(RobotController rc) {
-    	
+
     	Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST,
                 Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
         Random rand = new Random(rc.getID());
         int myAttackRange = 0;
         Team myTeam = rc.getTeam();
         Team enemyTeam = myTeam.opponent();
-    	
+
     	try {
             myAttackRange = rc.getType().attackRadiusSquared;
         } catch (Exception e) {
