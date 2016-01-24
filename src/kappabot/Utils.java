@@ -61,7 +61,9 @@ public class Utils {
 			case 32:
 				return "boxy_armageddon";
 			case 225:
-				return "castle/forts";
+				if (archons.length == 3) return "castle";
+				if (archons.length == 2) return "forts";
+				return ""+d;
 			case 2:
 				return "caverns";
 			case 442:
