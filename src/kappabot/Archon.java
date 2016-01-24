@@ -5,9 +5,7 @@ import battlecode.common.*;
 public class Archon {
 	public static RobotController rc = RobotPlayer.rc;
 	public static int id = -1, archons;
-	public static int turretPerimeter = 0;
 	public static MapLocation[] enemies;
-	public static MapLocation target;
 	
     public static void run() throws GameActionException {
     	if (rc.getRoundNum() == 0) {
@@ -20,13 +18,9 @@ public class Archon {
     			}
     		}
     		rc.setIndicatorString(0, "ARCHON #" + id);
+    		rc.setIndicatorString(1, Utils.identify(f));
     		
     		enemies = rc.getInitialArchonLocations(rc.getTeam().opponent());
-
-    		target = f[0];
     	}
-    	
-		int p = 0;
-		rc.setIndicatorString(1, "Perimeter size: " + p);
     }
 }
