@@ -26,29 +26,7 @@ public class Archon {
     		target = f[0];
     	}
     	
-    	if (!rc.canSenseLocation(target)) {
-    		Utils.moveTowards(target);
-    	} else {
-    		int p = 0;
-    		RobotInfo[] robots = rc.senseNearbyRobots();
-    		for (RobotInfo r : robots) {
-    			if (r.team == rc.getTeam().opponent()) continue;
-    			if (r.team == Team.ZOMBIE) continue;
-    			
-    			if (r.location.distanceSquaredTo(rc.getLocation()) <= 5) p++;
-    		}
-    		rc.setIndicatorString(1, "Perimeter size: " + p);
-    		
-    		if (rc.isCoreReady()) {
-    			if (p < 5) {
-    				// establish perimeter
-    				for (Direction d : Direction.values()) {
-    					if (rc.canBuild(d,RobotType.TURRET)) {
-    						rc.build(d,RobotType.TURRET);
-    					}
-    				}
-    			}
-    		}
-    	}
+		int p = 0;
+		rc.setIndicatorString(1, "Perimeter size: " + p);
     }
 }
