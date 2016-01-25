@@ -17,6 +17,7 @@ public class RobotPlayer {
 		
 		team259.turtlepull.RobotPlayer.run(rc);
 //		team259.guardrush.RobotPlayer.run(rc); < run this once its workable
+//		also run in the directory (to set up): sed -i 's/package .*/package team259.guardrush;/g' *.java
 	}
 	
 	public static String identify(MapLocation[] archons) {
