@@ -92,7 +92,7 @@ public class Archon {
                         int enemyDistance = 999;
                         RobotInfo closestEnemy = null;
                         for (int i = 0; i < enemies.length; i++) {
-                            if (enemies[i].location.distanceSquaredTo(rc.getLocation()) < enemyDistance && !enemies[i].type.equals(RobotType.ARCHON)) {
+                            if (enemies[i].location.distanceSquaredTo(rc.getLocation()) < enemyDistance && !enemies[i].type.equals(RobotType.ARCHON) && !enemies[i].type.equals(RobotType.SCOUT)) {
                                 closestEnemy = enemies[i];
                                 enemyDistance = enemies[i].location.distanceSquaredTo(rc.getLocation());
                             }
@@ -118,6 +118,12 @@ public class Archon {
                                 else if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
                                     // Too much rubble, so I should clear it
                                     rc.clearRubble(dirToMove);
+                                }else if (rc.senseRubble(rc.getLocation().add(dirToMove.rotateLeft())) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                                    // Too much rubble, so I should clear it
+                                    rc.clearRubble(dirToMove.rotateLeft());
+                                } else if (rc.senseRubble(rc.getLocation().add(dirToMove.rotateRight())) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                                    // Too much rubble, so I should clear it
+                                    rc.clearRubble(dirToMove.rotateRight());
                                 }
                                 // if we still can't move then we're fucked lol
                             }
@@ -203,7 +209,12 @@ public class Archon {
                         } else if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
                             // Too much rubble, so I should clear it
                             rc.clearRubble(dirToMove);
-                            // Check if I can move in this direction
+                        } else if (rc.senseRubble(rc.getLocation().add(dirToMove.rotateLeft())) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                            // Too much rubble, so I should clear it
+                            rc.clearRubble(dirToMove.rotateLeft());
+                        } else if (rc.senseRubble(rc.getLocation().add(dirToMove.rotateRight())) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                            // Too much rubble, so I should clear it
+                            rc.clearRubble(dirToMove.rotateRight());
                         }
                     }
                 }
