@@ -1,4 +1,4 @@
-package team259;
+package team259.turtlepull;
 
 import battlecode.common.*;
 
@@ -8,8 +8,8 @@ import java.lang.Math;
 /**
  * Created by samuel on 1/11/16.
  */
-public class Soldier {
-    public static void run(RobotController rc) {
+public class Guard {
+	public static void run(RobotController rc) {
         Random rand = new Random(rc.getID());
         int distance;
         int cycle = 0;
@@ -79,7 +79,7 @@ public class Soldier {
                             } else if (rc.canMove(dirToMove.rotateRight().rotateRight().rotateRight())) {
                                 rc.move(dirToMove.rotateRight().rotateRight().rotateRight());
                             } else if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
-                            // Too much rubble, so I should clear it
+                                // Too much rubble, so I should clear it
                                 rc.clearRubble(dirToMove);
                             }
                             // if we still can't move then we're fucked lol

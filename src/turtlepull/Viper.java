@@ -1,4 +1,4 @@
-package team259;
+package turtlepull;
 
 import battlecode.common.*;
 
@@ -8,7 +8,7 @@ import java.lang.Math;
 /**
  * Created by samuel on 1/11/16.
  */
-public class Guard {
+public class Viper {
     public static void run(RobotController rc) {
         Random rand = new Random(rc.getID());
         int distance;
@@ -163,6 +163,9 @@ public class Guard {
             }
             else if (r.type == RobotType.ARCHON || r.type ==  RobotType.SCOUT){
                 weakness *= 2;
+            }
+            if(r.viperInfectedTurns == 0 && r.team != Team.ZOMBIE){
+                weakness *=5;
             }
             if (weakness > weakestSoFar) {
                 weakestLocation = r.location;

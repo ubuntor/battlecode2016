@@ -5,8 +5,10 @@ import battlecode.common.*;
 public class RobotPlayer {
 	public static RobotController rc;
 	
-    public static void run(RobotController rcontrol) {
-    	rc = rcontrol;
+    public static void run(RobotController robotcontroller) {
+    	rc = robotcontroller;
+    	
+    	rush.RobotPlayer.run(rc);
     	
     	while (true) {
 			try {
