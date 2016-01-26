@@ -42,16 +42,16 @@ public class Archon {
                             break;
                         if (r.type.equals(RobotType.ARCHON))
                             rc.activate(r.location);
-                        else if (r.type.equals(RobotType.TURRET) || r.type.equals(RobotType.TTM)) {
+                        else if (r.type.equals(RobotType.VIPER) && prio < 4) {
                             bestToActivate = r;
                             prio = 5;
-                        } else if (r.type.equals(RobotType.VIPER) && prio < 4) {
-                            bestToActivate = r;
-                            prio = 4;
                         } else if (r.type.equals(RobotType.SOLDIER) && prio < 3) {
                             bestToActivate = r;
-                            prio = 3;
+                            prio = 4;
                         } else if (r.type.equals(RobotType.GUARD) && prio < 2) {
+                            bestToActivate = r;
+                            prio = 3;
+                        } else if (r.type.equals(RobotType.TURRET) || r.type.equals(RobotType.TTM)) {
                             bestToActivate = r;
                             prio = 2;
                         } else if (prio < 1) {
@@ -162,16 +162,16 @@ public class Archon {
                             break;
                         if (r.type.equals(RobotType.ARCHON))
                             prio = 6;
-                        else if (r.type.equals(RobotType.TURRET) || r.type.equals(RobotType.TTM)) {
+                        else if (r.type.equals(RobotType.VIPER) && prio < 4) {
                             bestToActivate = r;
                             prio = 5;
-                        } else if (r.type.equals(RobotType.VIPER) && prio < 4) {
-                            bestToActivate = r;
-                            prio = 4;
                         } else if (r.type.equals(RobotType.SOLDIER) && prio < 3) {
                             bestToActivate = r;
-                            prio = 3;
+                            prio = 4;
                         } else if (r.type.equals(RobotType.GUARD) && prio < 2) {
+                            bestToActivate = r;
+                            prio = 3;
+                        } else if (r.type.equals(RobotType.TURRET) || r.type.equals(RobotType.TTM)) {
                             bestToActivate = r;
                             prio = 2;
                         } else if (prio < 1) {
