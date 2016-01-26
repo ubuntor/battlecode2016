@@ -74,6 +74,15 @@ public class Archon {
                                 dirToBuild.rotateRight();
                             }
                         }
+                    } else if (rand.nextInt(100) >= 75 && rc.getTeamParts() >= RobotType.SOLDIER.partCost) {
+                        for (int i = 0; i < 8; i++) {
+                            if (rc.canBuild(dirToBuild, RobotType.SOLDIER)) {
+                                rc.build(dirToBuild, RobotType.SOLDIER);
+                                break;
+                            } else {
+                                dirToBuild.rotateRight();
+                            }
+                        }
                     } else if (rc.getTeamParts() >= RobotType.GUARD.partCost) {
                         for (int i = 0; i < 8; i++) {
                             if (rc.canBuild(dirToBuild, RobotType.GUARD)) {
