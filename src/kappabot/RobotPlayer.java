@@ -8,7 +8,7 @@ public class RobotPlayer {
     public static void run(RobotController robotcontroller) {
     	rc = robotcontroller;
     	
-    	rush.RobotPlayer.run(rc);
+    	guardRush.RobotPlayer.run(rc);
     	
     	while (true) {
 			try {
