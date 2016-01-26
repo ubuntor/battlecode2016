@@ -47,7 +47,7 @@ public class RobotPlayer {
 				case "voluted":
 				case "vortex":
 				case "wormy":
-					team259.turtlepull.RobotPlayer.run(rc);
+					team259.bigturtle.RobotPlayer.run(rc);
 					break;
 				case "barricade":
 				case "checkers":
@@ -73,9 +73,9 @@ public class RobotPlayer {
 		
 		if (rc.getTeam() == Team.A) team259.guardrush.RobotPlayer.run(rc);
 		// ^ THAT IS NOT PERMANENT
-		team259.turtlepull.RobotPlayer.run(rc); // when in doubt run turtle
+		team259.bigturtle.RobotPlayer.run(rc); // when in doubt run turtle
 
-//		sed -i 's/package .*/package team259.turtlepull;/g' *.java
+//		sed -i 's/package .*/package team259.bigturtle;/g' *.java
 //		sed -i 's/package .*/package team259.guardrush;/g' *.java
 	}
 	
