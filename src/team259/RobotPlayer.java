@@ -58,25 +58,10 @@ public class RobotPlayer {
 				case "barricade":
 				case "caverns":
 				case "checkers":
-				case "closequarters":
-				case "collision":
 				case "crater":
-				case "farm":
-				case "forest":
-				case "fortifications":
-				case "frogger":
-				case "lockdown":
-				case "nexus":
-				case "pants":
 				case "prisons":
 				case "quadrants":
-				case "quarry":
-				case "river":
 				case "scouting":
-				case "streets":
-				case "treasure":
-				case "voluted":
-				case "vortex":
 					team259.guardrush.RobotPlayer.run(rc);
 					break;
 				case "quartiles":
@@ -89,13 +74,13 @@ public class RobotPlayer {
 		
 		int avgDist = 0;
 		for(int i = 0; i < f.length; i++) {
-		            int minDist = Integer.MAX_VALUE;
-		            for(MapLocation loc : e){
-		                if(loc.distanceSquaredTo(f[i]) < minDist)
-		                    minDist = loc.distanceSquaredTo(f[i]);
-		            }
-		            avgDist += minDist;
-		        }
+            int minDist = Integer.MAX_VALUE;
+            for(MapLocation loc : e){
+                if(loc.distanceSquaredTo(f[i]) < minDist)
+                    minDist = loc.distanceSquaredTo(f[i]);
+            }
+            avgDist += minDist;
+        }
 		avgDist /= f.length;
 		// if small we run rush
 		if (avgDist < 200) team259.guardrush.RobotPlayer.run(rc);
