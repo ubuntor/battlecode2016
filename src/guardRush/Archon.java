@@ -59,7 +59,7 @@ public class Archon {
                             prio = 1;
                         }
                     }
-                    if (bestToActivate != null && rc.isCoreReady())
+                    if (bestToActivate != null && rc.isCoreReady() && rc.getLocation().distanceSquaredTo(bestToActivate.location) <= 2)
                         rc.activate(bestToActivate.location);
                 }
                 //build
@@ -155,7 +155,7 @@ public class Archon {
                         if (!rc.isCoreReady())
                             break;
                         if (r.type.equals(RobotType.ARCHON))
-                            rc.activate(r.location);
+                            prio = 6;
                         else if (r.type.equals(RobotType.TURRET) || r.type.equals(RobotType.TTM)) {
                             bestToActivate = r;
                             prio = 5;
