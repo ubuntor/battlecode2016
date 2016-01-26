@@ -81,6 +81,12 @@ public class Viper {
                             } else if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
                                 // Too much rubble, so I should clear it
                                 rc.clearRubble(dirToMove);
+                            } else if (rc.senseRubble(rc.getLocation().add(dirToMove.rotateLeft())) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                                // Too much rubble, so I should clear it
+                                rc.clearRubble(dirToMove.rotateLeft());
+                            } else if (rc.senseRubble(rc.getLocation().add(dirToMove.rotateRight())) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                                // Too much rubble, so I should clear it
+                                rc.clearRubble(dirToMove.rotateRight());
                             }
                             // if we still can't move then we're fucked lol
                         }
@@ -102,7 +108,12 @@ public class Viper {
                             } else if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
                                 // Too much rubble, so I should clear it
                                 rc.clearRubble(dirToMove);
-                                // Check if I can move in this direction
+                            } else if (rc.senseRubble(rc.getLocation().add(dirToMove.rotateLeft())) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                                // Too much rubble, so I should clear it
+                                rc.clearRubble(dirToMove.rotateLeft());
+                            } else if (rc.senseRubble(rc.getLocation().add(dirToMove.rotateRight())) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                                // Too much rubble, so I should clear it
+                                rc.clearRubble(dirToMove.rotateRight());
                             }
                         }
                     }
@@ -132,7 +143,12 @@ public class Viper {
                         } else if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
                             // Too much rubble, so I should clear it
                             rc.clearRubble(dirToMove);
-                            // Check if I can move in this direction
+                        } else if (rc.senseRubble(rc.getLocation().add(dirToMove.rotateLeft())) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                            // Too much rubble, so I should clear it
+                            rc.clearRubble(dirToMove.rotateLeft());
+                        } else if (rc.senseRubble(rc.getLocation().add(dirToMove.rotateRight())) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                            // Too much rubble, so I should clear it
+                            rc.clearRubble(dirToMove.rotateRight());
                         }
                     }
                 }
@@ -163,6 +179,9 @@ public class Viper {
             }
             else if (r.type == RobotType.ARCHON || r.type ==  RobotType.SCOUT){
                 weakness *= 2;
+            }
+            else if (r.type == RobotType.ZOMBIEDEN){
+                weakness /= 2;
             }
             if(r.viperInfectedTurns == 0 && r.team != Team.ZOMBIE){
                 weakness *=5;
