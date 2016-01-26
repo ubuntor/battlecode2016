@@ -71,7 +71,6 @@ public class RobotPlayer {
 				case "prisons":
 				case "quadrants":
 				case "quarry":
-				case "quartiles":
 				case "river":
 				case "scouting":
 				case "streets":
@@ -79,6 +78,9 @@ public class RobotPlayer {
 				case "voluted":
 				case "vortex":
 					team259.guardrush.RobotPlayer.run(rc);
+					break;
+				case "quartiles":
+					team259.soldierrush.RobotPlayer.run(rc);
 					break;
 			}
 		}
