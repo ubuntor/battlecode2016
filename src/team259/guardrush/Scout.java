@@ -7,6 +7,7 @@ import battlecode.common.*;
  */
 public class Scout {
     public static void run(RobotController rc) {
+        Direction dirToMove;
         try {
             // init stuff
         } catch (Exception e) {
@@ -15,40 +16,46 @@ public class Scout {
         }
         while (true) {
             try {
-                //targeting
-                int heuristic = -1;
-                MapLocation maxloc = rc.getLocation();
-                int val = 0;
-                RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), 53);
-                for(int i = 0; i < enemies.length; i++){
-                    val = 0;
-                    if(enemies[i].type == RobotType.GUARD || enemies[i].type == RobotType.ARCHON){
-                        val = 4;
-                    } else if(enemies[i].type == RobotType.TTM){
-                        val = 5;
-                    } else if(enemies[i].type == RobotType.SOLDIER){
-                        val = 6;
-                    } else if(enemies[i].type == RobotType.TURRET){
-                        val = 7;
-                    } else if(enemies[i].type == RobotType.VIPER){
-                        val = 8;
-                    } if (enemies[i].health <= 28) {
-                        val *= 2;
-                    }
-                    if(enemies[i].type == RobotType.FASTZOMBIE || enemies[i].type == RobotType.BIGZOMBIE){
-                        val = 1;
-                    } else if(enemies[i].type == RobotType.STANDARDZOMBIE) {
-                        val = 2;
-                    } else if(enemies[i].type == RobotType.RANGEDZOMBIE){
-                        val = 3;
-                    }
-                    if( val > heuristic){
-                        maxloc = enemies[i].location;
-                        heuristic = val;
-                    }
+                for(int i = 0; i < 5; i++){
+                    rc.broadcastSignal(10000);
                 }
-                if(!maxloc.equals(rc.getLocation())) {
-                    rc.broadcastMessageSignal(maxloc.x, maxloc.y, 106);
+                for(int i = 0; i < 20; i++){
+                    rc.broadcastMessageSignal(0,0,10000);
+                }
+                //run the fuck away if you see an enemy
+                if (rc.isCoreReady()) {
+                    RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), 53);
+                    if (enemies.length > 0) {
+                        int enemyDistance = 999;
+                        RobotInfo closestEnemy = null;
+                        for (int i = 0; i < enemies.length; i++) {
+                            if (enemies[i].location.distanceSquaredTo(rc.getLocation()) < enemyDistance && enemies[i].type.canAttack()) {
+                                closestEnemy = enemies[i];
+                                enemyDistance = enemies[i].location.distanceSquaredTo(rc.getLocation());
+                            }
+                        }
+                        if (closestEnemy != null) {
+                            dirToMove = closestEnemy.location.directionTo(rc.getLocation());
+                            if (rc.canMove(dirToMove)) {
+                                // Move away
+                                rc.move(dirToMove);
+                            } else {
+                                if (rc.canMove(dirToMove.rotateLeft()))
+                                    rc.move(dirToMove.rotateLeft());
+                                else if (rc.canMove(dirToMove.rotateRight()))
+                                    rc.move(dirToMove.rotateRight());
+                                else if (rc.canMove(dirToMove.rotateLeft().rotateLeft()))
+                                    rc.move(dirToMove.rotateLeft().rotateLeft());
+                                else if (rc.canMove(dirToMove.rotateRight().rotateRight()))
+                                    rc.move(dirToMove.rotateRight().rotateRight());
+                                else if (rc.canMove(dirToMove.rotateLeft().rotateLeft().rotateLeft()))
+                                    rc.move(dirToMove.rotateLeft().rotateLeft().rotateLeft());
+                                else if (rc.canMove(dirToMove.rotateRight().rotateRight().rotateRight()))
+                                    rc.move(dirToMove.rotateRight().rotateRight().rotateRight());
+                                // if we still can't move then we're fucked lol
+                            }
+                        }
+                    }
                 }
                 Clock.yield();
             } catch (Exception e) {
