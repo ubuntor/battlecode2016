@@ -1,4 +1,4 @@
-package guardRush;
+package team259.guardrush;
 
 import battlecode.common.*;
 
