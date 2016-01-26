@@ -25,40 +25,57 @@ public class RobotPlayer {
 							// if it does then just run it
 				}
 			}
-			map = ""; // we should be listening for a signal
 		} else {
 			map = identify(rc.getInitialArchonLocations(rc.getTeam()));
 		}
 		*/
-		map = identify(rc.getInitialArchonLocations(rc.getTeam()));
+		MapLocation[] f = rc.getInitialArchonLocations(rc.getTeam());
+		
+		map = identify(f);
 		if (!map.equals("")) {
 			// map identification successful
 			switch (map) {
 				case "boxy":
-				case "caverns":
 				case "desert":
 				case "factory":
+				case "forts":
 				case "placard":
-				case "prisons":
+				case "river":
 				case "seamed":
 				case "spiral":
-				case "streets":
 				case "swamp":
+				case "voluted":
 				case "vortex":
 				case "wormy":
-					team259.turtlepull.RobotPlayer.run(rc);
+					team259.bigturtle.RobotPlayer.run(rc);
 					break;
 				case "barricade":
+				case "checkers":
+				case "closequarters":
+				case "crater":
+				case "farm":
+				case "forest":
+				case "fortifications":
+				case "frogger":
+				case "helloworld":
+				case "lockdown":
+				case "presents":
+				case "quadrants":
+				case "quartiles":
+				case "scouting":
+				case "turtle":
 					team259.guardrush.RobotPlayer.run(rc);
-				default:
+					break;
 			}
 		}
 		// fuck we gotta do this ad hoc
+		MapLocation[] e = rc.getInitialArchonLocations(rc.getTeam().opponent());
+		
 		if (rc.getTeam() == Team.A) team259.guardrush.RobotPlayer.run(rc);
 		// ^ THAT IS NOT PERMANENT
-		team259.turtlepull.RobotPlayer.run(rc); // when in doubt run turtle
+		team259.bigturtle.RobotPlayer.run(rc); // when in doubt run turtle
 
-//		sed -i 's/package .*/package team259.turtlepull;/g' *.java
+//		sed -i 's/package .*/package team259.bigturtle;/g' *.java
 //		sed -i 's/package .*/package team259.guardrush;/g' *.java
 	}
 	
