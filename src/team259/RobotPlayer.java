@@ -87,9 +87,20 @@ public class RobotPlayer {
 		// fuck we gotta do this ad hoc
 		MapLocation[] e = rc.getInitialArchonLocations(rc.getTeam().opponent());
 		
-		if (rc.getTeam() == Team.A) team259.guardrush.RobotPlayer.run(rc);
-		// ^ THAT IS NOT PERMANENT
-		team259.bigturtle.RobotPlayer.run(rc); // when in doubt run turtle
+		int avgDist = 0;
+		for(int i = 0; i < f.length; i++) {
+		            int minDist = Integer.MAX_VALUE;
+		            for(MapLocation loc : e){
+		                if(loc.distanceSquaredTo(f[i]) < minDist)
+		                    minDist = loc.distanceSquaredTo(f[i]);
+		            }
+		            avgDist += minDist;
+		        }
+		avgDist /= f.length;
+		// if small we run rush
+		if (avgDist < 200) team259.guardrush.RobotPlayer.run(rc);
+		// when in doubt run turtle
+		team259.bigturtle.RobotPlayer.run(rc); 
 
 //		sed -i 's/package .*/package team259.bigturtle;/g' *.java
 //		sed -i 's/package .*/package team259.guardrush;/g' *.java
