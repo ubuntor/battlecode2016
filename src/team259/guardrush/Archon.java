@@ -97,7 +97,7 @@ public class Archon {
                                 enemyDistance = enemies[i].location.distanceSquaredTo(rc.getLocation());
                             }
                         }
-                        if (!closestEnemy.equals(null)) {
+                        if (closestEnemy != null) {
                             dirToMove = closestEnemy.location.directionTo(rc.getLocation());
                             if (rc.canMove(dirToMove)) {
                                 // Move away
