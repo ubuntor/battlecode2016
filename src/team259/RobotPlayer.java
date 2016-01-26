@@ -35,35 +35,49 @@ public class RobotPlayer {
 		if (!map.equals("")) {
 			// map identification successful
 			switch (map) {
+				case "backbencher":
 				case "boxy":
+				case "channel":
 				case "desert":
 				case "factory":
 				case "forts":
+				case "helloworld":
 				case "placard":
-				case "river":
+				case "presents":
 				case "seamed":
+				case "space":
+				case "spaghetti":
 				case "spiral":
 				case "swamp":
-				case "voluted":
-				case "vortex":
+				case "tunnels":
+				case "turtle":
 				case "wormy":
+				case "zigzag":
 					team259.bigturtle.RobotPlayer.run(rc);
 					break;
 				case "barricade":
+				case "caverns":
 				case "checkers":
 				case "closequarters":
+				case "collision":
 				case "crater":
 				case "farm":
 				case "forest":
 				case "fortifications":
 				case "frogger":
-				case "helloworld":
 				case "lockdown":
-				case "presents":
+				case "nexus":
+				case "pants":
+				case "prisons":
 				case "quadrants":
+				case "quarry":
 				case "quartiles":
+				case "river":
 				case "scouting":
-				case "turtle":
+				case "streets":
+				case "treasure":
+				case "voluted":
+				case "vortex":
 					team259.guardrush.RobotPlayer.run(rc);
 					break;
 			}
