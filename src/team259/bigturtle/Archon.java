@@ -435,7 +435,7 @@ public class Archon {
 //    		rc.broadcastMessageSignal(Utils.ARCHON_FINAL_HOME, 0, 70);
     		return true;
     	}
-    	if(rc.isCoreReady()){
+    	if(rc.isCoreReady() && toMove != null){
     		if(rc.canMove(toMove)){
     			rc.move(toMove);
     		} else if(rc.canMove(toMove.rotateLeft())){
@@ -523,6 +523,8 @@ public class Archon {
 		boolean built = false;
 //		System.out.println("im not building at " + covered);
 		for(MapLocation loc : scoutLocs){
+			if(rc.getLocation().distanceSquaredTo(loc) > rc.getType().sensorRadiusSquared)
+				continue;
 			if((rc.senseRobotAtLocation(loc) == null || !rc.senseRobotAtLocation(loc).type.equals(RobotType.SCOUT)) && !covered.contains(loc)){
 				Direction dirToBuild = Direction.NORTH;
 		        for (int i = 0; i < 8; i++) {

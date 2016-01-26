@@ -40,7 +40,7 @@ public class Guard {
             	neutralRun(rc);
             }
             if(tlArchon == null){
-                for(RobotInfo r : rc.senseNearbyRobots(24, myTeam)){
+                for(RobotInfo r : rc.senseNearbyRobots(rc.getType().sensorRadiusSquared, myTeam)){
                 	if(r.type.equals(RobotType.ARCHON)){
                 		if(tlArchon == null)
                 			tlArchon = r.location;

@@ -122,7 +122,7 @@ public class Soldier {
 					if (rc.senseRubble(currLoc.add(moveDir)) > 0){
 						rc.clearRubble(moveDir);
 //						System.out.println("" + rc.getID() + ": clearing rubble");
-					} else if(rc.senseRubble(currLoc.add(currLoc.directionTo(tlArchon))) > 0 && Math.random() < 0.4){
+					} else if(!tlArchon.equals(currLoc) && rc.senseRubble(currLoc.add(currLoc.directionTo(tlArchon))) > 0 && Math.random() < 0.4){
 							rc.clearRubble(currLoc.directionTo(tlArchon));
 					} else if(!rc.canMove(moveDir)){
 						RobotInfo inWay = rc.senseRobotAtLocation(currLoc.add(moveDir));
