@@ -151,7 +151,6 @@ public class Turret {
                             break;
                         }
                     default:
-                        System.out.println("uwotm8");
                 }
                 Clock.yield();
             } catch (Exception e) {
