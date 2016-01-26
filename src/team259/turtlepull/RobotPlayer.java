@@ -1,4 +1,4 @@
-package rush;
+package team259.turtlepull;
 
 import battlecode.common.*;
 

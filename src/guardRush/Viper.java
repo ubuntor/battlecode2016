@@ -1,4 +1,4 @@
-package rush;
+package guardRush;
 
 import battlecode.common.*;
 
@@ -8,7 +8,7 @@ import java.lang.Math;
 /**
  * Created by samuel on 1/11/16.
  */
-public class Soldier {
+public class Viper {
     public static void run(RobotController rc) {
         Random rand = new Random(rc.getID());
         int distance;
@@ -79,7 +79,7 @@ public class Soldier {
                             } else if (rc.canMove(dirToMove.rotateRight().rotateRight().rotateRight())) {
                                 rc.move(dirToMove.rotateRight().rotateRight().rotateRight());
                             } else if (rc.senseRubble(rc.getLocation().add(dirToMove)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
-                            // Too much rubble, so I should clear it
+                                // Too much rubble, so I should clear it
                                 rc.clearRubble(dirToMove);
                             }
                             // if we still can't move then we're fucked lol
@@ -163,6 +163,12 @@ public class Soldier {
             }
             else if (r.type == RobotType.ARCHON || r.type ==  RobotType.SCOUT){
                 weakness *= 2;
+            }
+            else if (r.type == RobotType.ZOMBIEDEN){
+                weakness /= 2;
+            }
+            if(r.viperInfectedTurns == 0 && r.team != Team.ZOMBIE){
+                weakness *=5;
             }
             if (weakness > weakestSoFar) {
                 weakestLocation = r.location;

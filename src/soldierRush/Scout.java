@@ -1,4 +1,4 @@
-package team259;
+package soldierRush;
 
 import battlecode.common.*;
 

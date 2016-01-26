@@ -1,4 +1,4 @@
-package rush;
+package soldierRush;
 
 /**
  * Created by samuel on 1/11/16.
