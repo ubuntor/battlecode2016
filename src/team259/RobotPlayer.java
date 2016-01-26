@@ -9,10 +9,38 @@ public class RobotPlayer {
 	public static void run(RobotController robotcontroller) {
 		rc = robotcontroller;
 		
-		if (rc.getRoundNum() == 0) {
-			map = identify(rc.getInitialArchonLocations(rc.getTeam()));
-		} else {
+		// optimally, we'd only decide on a plan for the first round,
+		// and all later robots will have to find out what the plan is.
+		// but i dont feel comfortable enough poking around in the
+		// other code, if i miss a signal somewhere then the new robot
+		// will just kill itself if it has no orders
+		/*
+		if (rc.getRoundNum() != 0) {
+			Signal[] signals = rc.emptySignalQueue();
+			if (signals.length > 0) {
+				for (Signal s : signals) {
+					if (s.getTeam() == rc.getTeam())
+						if (s.getMessage() != null)
+							// check if it fits guardrush or turtlepull
+							// if it does then just run it
+				}
+			}
 			map = ""; // we should be listening for a signal
+		} else {
+			map = identify(rc.getInitialArchonLocations(rc.getTeam()));
+		}
+		*/
+		map = identify(rc.getInitialArchonLocations(rc.getTeam()));
+		if (!map.equals("")) {
+			// map identification successful
+			switch (map) {
+				case "6147":
+				case "arena":
+				case "backbencher":
+					team259.turtlepull.RobotPlayer.run(rc);
+//					team259.guardrush.RobotPlayer.run(rc);
+				default:
+			}
 		}
 		
 		team259.turtlepull.RobotPlayer.run(rc);
@@ -45,7 +73,7 @@ public class RobotPlayer {
 						if (!rc.canMove(Direction.SOUTH)) return "spiral"; 
 						return "swamp";
 					default:
-						return ""+d;
+						return "";
 				}
 			case 170:
 				return "boxy";
@@ -54,7 +82,7 @@ public class RobotPlayer {
 			case 225:
 				if (archons.length == 3) return "castle";
 				if (archons.length == 2) return "forts";
-				return ""+d;
+				return "";
 			case 2:
 				return "caverns";
 			case 442:
@@ -76,7 +104,7 @@ public class RobotPlayer {
 					if (t == 4 || t == -5) return "crumble";
 					if (t == 0) return "frogger";  
 				}
-				return ""+d;
+				return "";
 			case 8:
 				return "desert";
 			case 2601:
@@ -89,7 +117,7 @@ public class RobotPlayer {
 			case 185:
 				if (archons.length == 4) return "forest";
 				if (archons.length == 2) return "molasses";
-				return ""+d;
+				return "";
 			case 121:
 				return "fortifications";
 			case 242:
@@ -109,7 +137,7 @@ public class RobotPlayer {
 			case 157:
 	    		if (archons.length == 4) return "placard";
 	    		if (archons.length == 2) return "zigzag";
-				return ""+d;
+				return "";
 			case 261:
 				return "presents";
 			case 9:
@@ -143,7 +171,7 @@ public class RobotPlayer {
 			case 520:
 				return "wormy";
 			default:
-				return ""+d;
+				return "";
 		}
 	}
 }
