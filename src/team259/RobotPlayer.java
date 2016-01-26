@@ -34,17 +34,29 @@ public class RobotPlayer {
 		if (!map.equals("")) {
 			// map identification successful
 			switch (map) {
-				case "6147":
-				case "arena":
-				case "backbencher":
+				case "boxy":
+				case "caverns":
+				case "desert":
+				case "factory":
+				case "placard":
+				case "prisons":
+				case "seamed":
+				case "spiral":
+				case "streets":
+				case "swamp":
+				case "vortex":
+				case "wormy":
 					team259.turtlepull.RobotPlayer.run(rc);
 //					team259.guardrush.RobotPlayer.run(rc);
 				default:
 			}
+		} else {
+			// fuck we gotta do this ad hoc
+			if (rc.getTeam() == Team.A)
+				team259.turtlepull.RobotPlayer.run(rc);
+			team259.guardrush.RobotPlayer.run(rc);
 		}
-		
-		team259.turtlepull.RobotPlayer.run(rc);
-//		team259.guardrush.RobotPlayer.run(rc); < run this once its workable
+
 //		also run in the directory (to set up): sed -i 's/package .*/package team259.guardrush;/g' *.java
 	}
 	
