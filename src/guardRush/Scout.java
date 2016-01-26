@@ -43,7 +43,7 @@ public class Scout {
                             targetNum++;
                             targetNum = targetNum % targets.length;
                             if (originalTarget == targets[targetNum]) {
-                                cycle = 1;
+                                    cycle = 1;
                             }
                         } else if (targetNum < targets.length) {
                             dirToMove = rc.getLocation().directionTo(targets[targetNum]);
