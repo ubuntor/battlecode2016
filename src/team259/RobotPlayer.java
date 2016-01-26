@@ -47,20 +47,19 @@ public class RobotPlayer {
 				case "vortex":
 				case "wormy":
 					team259.turtlepull.RobotPlayer.run(rc);
-//					team259.guardrush.RobotPlayer.run(rc);
+					break;
+				case "barricade":
+					team259.guardrush.RobotPlayer.run(rc);
 				default:
 			}
-		} else {
-			// fuck we gotta do this ad hoc
-			if (rc.getTeam() == Team.A)
-				team259.turtlepull.RobotPlayer.run(rc);
-			team259.guardrush.RobotPlayer.run(rc);
 		}
-		
-		
+		// fuck we gotta do this ad hoc
+		if (rc.getTeam() == Team.A) team259.guardrush.RobotPlayer.run(rc);
+		// ^ THAT IS NOT PERMANENT
 		team259.turtlepull.RobotPlayer.run(rc); // when in doubt run turtle
 
-//		also run in the directory (to set up): sed -i 's/package .*/package team259.guardrush;/g' *.java
+//		sed -i 's/package .*/package team259.turtlepull;/g' *.java
+//		sed -i 's/package .*/package team259.guardrush;/g' *.java
 	}
 	
 	public static String identify(MapLocation[] archons) {

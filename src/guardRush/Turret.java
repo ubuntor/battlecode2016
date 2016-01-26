@@ -77,7 +77,7 @@ public class Turret {
                         if (bestTarget != null && rc.isWeaponReady())
                             rc.attackLocation(bestTarget.location);
 
-                        else if (bestTarget == null)
+                        if (hostile.length == 0 || bestTarget == null)
                             rc.pack();
                         break;
                     case TTM:
@@ -117,7 +117,7 @@ public class Turret {
                                 }
                             }
                         }
-                        if(hostile.length == 0) {
+                        if (hostile.length == 0) {
                             hostile = rc.senseHostileRobots(currLoc, rc.getType().sensorRadiusSquared);
                             if (hostile.length != 0) {
                                 rc.unpack();
@@ -151,7 +151,6 @@ public class Turret {
                             break;
                         }
                     default:
-                        System.out.println("uwotm8");
                 }
                 Clock.yield();
             } catch (Exception e) {
