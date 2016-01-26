@@ -42,10 +42,7 @@ public class Archon {
                             break;
                         if (r.type.equals(RobotType.ARCHON))
                             rc.activate(r.location);
-                        else if (r.type.equals(RobotType.TURRET) || r.type.equals(RobotType.TTM)) {
-                            bestToActivate = r;
-                            prio = 5;
-                        } else if (r.type.equals(RobotType.VIPER) && prio < 4) {
+                        else if (r.type.equals(RobotType.VIPER) && prio < 4) {
                             bestToActivate = r;
                             prio = 4;
                         } else if (r.type.equals(RobotType.SOLDIER) && prio < 3) {
@@ -92,7 +89,7 @@ public class Archon {
                         int enemyDistance = 999;
                         RobotInfo closestEnemy = null;
                         for (int i = 0; i < enemies.length; i++) {
-                            if (enemies[i].location.distanceSquaredTo(rc.getLocation()) < enemyDistance && !enemies[i].type.equals(RobotType.ARCHON) && !enemies[i].type.equals(RobotType.SCOUT)) {
+                            if (enemies[i].location.distanceSquaredTo(rc.getLocation()) < enemyDistance && enemies[i].type.canAttack()) {
                                 closestEnemy = enemies[i];
                                 enemyDistance = enemies[i].location.distanceSquaredTo(rc.getLocation());
                             }
@@ -160,9 +157,7 @@ public class Archon {
                     for (RobotInfo r : neutrals) {
                         if (!rc.isCoreReady())
                             break;
-                        if (r.type.equals(RobotType.ARCHON))
-                            prio = 6;
-                        else if (r.type.equals(RobotType.TURRET) || r.type.equals(RobotType.TTM)) {
+                        if (r.type.equals(RobotType.TURRET) || r.type.equals(RobotType.TTM)) {
                             bestToActivate = r;
                             prio = 5;
                         } else if (r.type.equals(RobotType.VIPER) && prio < 4) {
