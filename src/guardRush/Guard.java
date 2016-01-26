@@ -164,6 +164,9 @@ public class Guard {
             else if (r.type == RobotType.ARCHON || r.type ==  RobotType.SCOUT){
                 weakness *= 2;
             }
+            else if (r.type == RobotType.ZOMBIEDEN){
+                weakness /= 2;
+            }
             if (weakness > weakestSoFar) {
                 weakestLocation = r.location;
                 weakestSoFar = weakness;

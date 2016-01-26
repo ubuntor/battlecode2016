@@ -164,6 +164,9 @@ public class Viper {
             else if (r.type == RobotType.ARCHON || r.type ==  RobotType.SCOUT){
                 weakness *= 2;
             }
+            else if (r.type == RobotType.ZOMBIEDEN){
+                weakness /= 2;
+            }
             if(r.viperInfectedTurns == 0 && r.team != Team.ZOMBIE){
                 weakness *=5;
             }
