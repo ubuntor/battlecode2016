@@ -77,14 +77,14 @@ public class Turret {
                         if (bestTarget != null && rc.isWeaponReady())
                             rc.attackLocation(bestTarget.location);
 
-                        if (bestTarget == null)
+                        else if (bestTarget == null)
                             rc.pack();
                         break;
                     case TTM:
                         currLoc = rc.getLocation();
                         //RUN AWAY
+                        hostile = rc.senseHostileRobots(currLoc, 5);
                         if (rc.isCoreReady()) {
-                            hostile = rc.senseHostileRobots(currLoc, 5);
                             if (hostile.length != 0) {
                                 int enemyDistance = 999;
                                 closestEnemy = null;
@@ -127,11 +127,13 @@ public class Turret {
                                 }
                             }
                         }
-
-                        hostile = rc.senseHostileRobots(currLoc, rc.getType().sensorRadiusSquared);
-                        if (hostile.length != 0) {
-                            rc.unpack();
+                        if(hostile.length == 0) {
+                            hostile = rc.senseHostileRobots(currLoc, rc.getType().sensorRadiusSquared);
+                            if (hostile.length != 0) {
+                                rc.unpack();
+                            }
                         }
+
 
                         //patrol/move
                         if (rc.isCoreReady()) {
