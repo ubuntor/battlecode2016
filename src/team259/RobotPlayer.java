@@ -56,6 +56,9 @@ public class RobotPlayer {
 				team259.turtlepull.RobotPlayer.run(rc);
 			team259.guardrush.RobotPlayer.run(rc);
 		}
+		
+		
+		team259.turtlepull.RobotPlayer.run(rc); // when in doubt run turtle
 
 //		also run in the directory (to set up): sed -i 's/package .*/package team259.guardrush;/g' *.java
 	}
