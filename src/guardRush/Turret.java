@@ -124,6 +124,7 @@ public class Turret {
                             }
                         }
 
+
                         //patrol/move
                         if (rc.isCoreReady()) {
                             dirToMove = directions[rand.nextInt(8)];
